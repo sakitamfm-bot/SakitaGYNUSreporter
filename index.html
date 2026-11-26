@@ -1,0 +1,1639 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="icon-180.png">
+<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="SakitaGYNUSreporter">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="theme-color" content="#0e6f86">
+<title>SakitaGYNUSreporter</title>
+<style>
+:root{
+  --bg:#f5f6f8;--card:#ffffff;--ink:#1a1e24;--muted:#5b6470;--line:#dce0e5;--soft:#eef1f4;
+  --accent:#0a6a85;--accent-ink:#ffffff;
+  --warn:#8a5300;--warnbg:#fff3dc;--bad:#b42318;--badbg:#fdecea;--ok:#17713a;--okbg:#e6f4eb;
+  --o0bg:#e4e7eb;--o0:#3b434d;--o1bg:#dff3e6;--o1:#17713a;--o2bg:#e3f1f8;--o2:#0a5c75;
+  --o3bg:#fff1c9;--o3:#7a5200;--o4bg:#ffe0c7;--o4:#8f3b00;--o5bg:#fbd5d2;--o5:#9c1c12;
+  --mono:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#0e1115;--card:#161a20;--ink:#e5e8ed;--muted:#97a1ad;--line:#2a3039;--soft:#1e232a;
+  --accent:#4cb2cf;--accent-ink:#06141a;
+  --warn:#f2b555;--warnbg:#2c2210;--bad:#ff8c82;--badbg:#341613;--ok:#72d293;--okbg:#0f2a19;
+  --o0bg:#2a3039;--o0:#c9d0d8;--o1bg:#12301d;--o1:#7fdc9e;--o2bg:#0f2a35;--o2:#7fcbe2;
+  --o3bg:#33290c;--o3:#f3c95c;--o4bg:#3a220f;--o4:#ffaa66;--o5bg:#3d1714;--o5:#ff9187;
+}}
+:root[data-theme="dark"]{
+  --bg:#0e1115;--card:#161a20;--ink:#e5e8ed;--muted:#97a1ad;--line:#2a3039;--soft:#1e232a;
+  --accent:#4cb2cf;--accent-ink:#06141a;
+  --warn:#f2b555;--warnbg:#2c2210;--bad:#ff8c82;--badbg:#341613;--ok:#72d293;--okbg:#0f2a19;
+  --o0bg:#2a3039;--o0:#c9d0d8;--o1bg:#12301d;--o1:#7fdc9e;--o2bg:#0f2a35;--o2:#7fcbe2;
+  --o3bg:#33290c;--o3:#f3c95c;--o4bg:#3a220f;--o4:#ffaa66;--o5bg:#3d1714;--o5:#ff9187;
+}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--bg);color:var(--ink);font:14px/1.45 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif}
+header{position:sticky;top:0;z-index:5;background:var(--card);border-bottom:1px solid var(--line);padding:10px 16px;display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+header h1{font-size:16px;margin:0 auto 0 0;font-weight:650;letter-spacing:.1px}
+header h1 small{display:block;font-weight:400;color:var(--muted);font-size:12px}
+button{font:inherit;border:1px solid var(--line);background:var(--card);color:var(--ink);border-radius:7px;padding:6px 11px;cursor:pointer}
+button:hover{background:var(--soft)}
+button.primary{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+button.primary:hover{filter:brightness(1.07)}
+button.ghost{border-style:dashed;width:100%;padding:9px}
+button.del{color:var(--bad);border-color:transparent;padding:3px 8px}
+.app{display:grid;grid-template-columns:minmax(0,1fr);gap:16px;padding:16px;max-width:1500px;margin:0 auto}
+@media (min-width:1060px){.app{grid-template-columns:minmax(0,1.15fr) minmax(0,.85fr)}.out{position:sticky;top:70px;align-self:start;max-height:calc(100vh - 86px);overflow:auto}}
+.card{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:14px 14px 10px;margin-bottom:14px}
+.card h2{font-size:14px;margin:0 0 10px;display:flex;align-items:center;gap:8px}
+.card h2 .n{display:inline-grid;place-items:center;width:22px;height:22px;border-radius:50%;background:var(--soft);font-size:12px;color:var(--muted)}
+.sub{border:1px solid var(--line);border-radius:9px;padding:11px;margin:0 0 10px;background:var(--bg)}
+.sub-h{display:flex;align-items:center;gap:8px;margin-bottom:8px;font-weight:600}
+.sub-h .sp{flex:1}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px 10px;margin-bottom:8px}
+.grid.w{grid-template-columns:repeat(auto-fill,minmax(220px,1fr))}
+label.f{display:flex;flex-direction:column;gap:3px;font-size:12px;color:var(--muted);min-width:0}
+label.f>span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.inp{display:flex;align-items:center;border:1px solid var(--line);border-radius:6px;background:var(--card);overflow:hidden}
+.inp:focus-within{border-color:var(--accent);box-shadow:0 0 0 2px color-mix(in srgb,var(--accent) 25%,transparent)}
+.inp input,.inp select{flex:1;min-width:0;border:0;background:transparent;color:var(--ink);font:inherit;font-size:14px;padding:6px 8px;outline:none}
+.inp select{cursor:pointer}
+.inp em{font-style:normal;color:var(--muted);font-size:12px;padding:0 8px 0 2px}
+label.c{display:flex;gap:7px;align-items:flex-start;font-size:13px;color:var(--ink);padding:5px 0;cursor:pointer}
+label.c input{margin-top:2px;accent-color:var(--accent)}
+fieldset{border:1px dashed var(--line);border-radius:8px;padding:8px 10px 2px;margin:4px 0 10px}
+legend{font-size:12px;color:var(--muted);padding:0 4px}
+.hint{font-size:12px;color:var(--muted);margin:-2px 0 8px}
+.calc{display:flex;flex-wrap:wrap;gap:6px;margin-top:4px}
+.chip{display:inline-flex;align-items:center;gap:5px;background:var(--soft);border-radius:999px;padding:2px 9px;font-size:12px;color:var(--ink)}
+.chip b{font-weight:650}
+.chip.warn{background:var(--warnbg);color:var(--warn)}
+.chip.bad{background:var(--badbg);color:var(--bad)}
+.chip.ok{background:var(--okbg);color:var(--ok)}
+.or{display:inline-block;border-radius:6px;padding:1px 7px;font-weight:700;font-size:12px}
+.or0{background:var(--o0bg);color:var(--o0)}.or1{background:var(--o1bg);color:var(--o1)}.or2{background:var(--o2bg);color:var(--o2)}
+.or3{background:var(--o3bg);color:var(--o3)}.or4{background:var(--o4bg);color:var(--o4)}.or5{background:var(--o5bg);color:var(--o5)}.orx{background:var(--soft);color:var(--muted)}
+.cls{margin-top:8px;border-top:1px solid var(--line);padding-top:8px;display:grid;gap:5px;font-size:13px}
+.cls .row{display:flex;gap:8px;align-items:baseline;flex-wrap:wrap}
+.cls .k{color:var(--muted);min-width:92px;font-size:12px}
+.note{font-size:12px;padding:5px 8px;border-radius:6px;background:var(--warnbg);color:var(--warn)}
+.summary{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:10px}
+.sumcard{flex:1 1 140px;background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:8px 10px}
+.sumcard .t{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.4px}
+.sumcard .v{font-size:15px;font-weight:650;margin-top:2px}
+pre#report{white-space:pre-wrap;word-wrap:break-word;font:12.5px/1.5 var(--mono);background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:12px;margin:0;min-height:200px}
+.bar{display:flex;gap:8px;align-items:center;margin-bottom:10px;flex-wrap:wrap}
+.bar .sp{flex:1}
+.disc{font-size:12px;color:var(--muted);margin-top:10px}
+.ref{font-size:12px;color:var(--muted)}
+.ref li{margin:2px 0}
+.toast{position:fixed;bottom:18px;left:50%;transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:7px 14px;border-radius:8px;font-size:13px;opacity:0;transition:opacity .2s;pointer-events:none}
+.toast.on{opacity:1}
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:8px;overflow:hidden;margin:0 6px 8px 0;vertical-align:top}
+.seg:empty{display:none}
+.seg button{border:0;border-radius:0;padding:5px 11px;font-size:13px;background:var(--card)}
+.seg button+button{border-left:1px solid var(--line)}
+.seg button.on{background:var(--accent);color:var(--accent-ink)}
+.v3wrap{position:relative;height:440px;border:1px solid var(--line);border-radius:9px;overflow:hidden;background:radial-gradient(ellipse at 50% 40%,var(--card) 0%,var(--bg) 75%)}
+#v3{display:block;width:100%;height:100%;touch-action:none;cursor:grab}
+.v3tools{position:absolute;right:8px;bottom:8px;display:flex;gap:6px}
+.v3tools button{font-size:12px;padding:4px 9px;background:var(--card)}
+.v3tools button.on{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+.v3abbr{margin:6px 0 0;padding-top:6px;border-top:1px dashed var(--line);font-size:11.5px}
+.v3abbr b{font-weight:600;color:var(--ink)}
+.layers{display:flex;flex-wrap:wrap;gap:0 16px;margin:-2px 0 6px}
+.layers label.c{font-size:12px;padding:2px 0}
+.v3hint{position:absolute;left:10px;top:8px;font-size:11px;color:var(--muted);pointer-events:none}
+.legend{display:flex;flex-wrap:wrap;gap:6px 12px;margin:8px 0 2px;font-size:12px;color:var(--muted)}
+.legend i{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:5px;vertical-align:-1px}
+.legend i.ln{height:3px;width:14px;border-radius:2px;vertical-align:2px}
+
+/* ---- measurement guide ---- */
+:root{--g-tis:#f4cfc9;--g-line:#a5726c;--g-endo:#efc35e;--g-fluid:#22344a;--g-fluidL:#e3e9ef;--g-ov:#f3dcc6;--g-solid:#dba17c;--g-sep:#f1e5dd;--g-flow:#e0342c;--g-shadow:rgba(20,28,40,.55);--g-enh:rgba(255,255,255,.55);--g-blad:#fbecb3;--g-fib:#e8a15e;--g-cav:#fbf1d8;--g-cal:#0a6a85}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--g-tis:#6b3d3a;--g-line:#c89893;--g-endo:#b58d2e;--g-fluid:#0a121c;--g-fluidL:#25303b;--g-ov:#6e5644;--g-solid:#a8714f;--g-sep:#d9c8bd;--g-flow:#ff6a5f;--g-shadow:rgba(0,0,0,.65);--g-enh:rgba(255,255,255,.12);--g-blad:#5f5426;--g-fib:#a8692c;--g-cav:#3a3320;--g-cal:#4cb2cf}}
+:root[data-theme="dark"]{--g-tis:#6b3d3a;--g-line:#c89893;--g-endo:#b58d2e;--g-fluid:#0a121c;--g-fluidL:#25303b;--g-ov:#6e5644;--g-solid:#a8714f;--g-sep:#d9c8bd;--g-flow:#ff6a5f;--g-shadow:rgba(0,0,0,.65);--g-enh:rgba(255,255,255,.12);--g-blad:#5f5426;--g-fib:#a8692c;--g-cav:#3a3320;--g-cal:#4cb2cf}
+.gq{display:inline-grid;place-items:center;width:17px;height:17px;padding:0;margin-left:5px;border-radius:50%;font-size:11px;font-weight:700;line-height:1;vertical-align:1px;color:var(--accent);background:transparent;border:1px solid color-mix(in srgb,var(--accent) 55%,transparent);cursor:pointer}
+.gq:hover{background:var(--accent);color:var(--accent-ink)}
+.gback{font-size:13px}
+.gone .gcard{margin:16px}
+.glink{font-size:12px;padding:2px 10px;border-radius:999px;margin-left:auto;color:var(--accent);font-weight:500}
+dialog.guide{width:min(1240px,96vw);max-height:92vh;padding:0;border:1px solid var(--line);border-radius:12px;background:var(--bg);color:var(--ink);box-shadow:0 20px 60px rgba(0,0,0,.35)}
+dialog.guide[open]{display:flex;flex-direction:column}
+dialog.guide::backdrop{background:rgba(10,14,20,.5)}
+.gbar{display:flex;flex-wrap:wrap;gap:8px;align-items:center;padding:12px 16px;background:var(--card);border-bottom:1px solid var(--line)}
+.gbar h2{margin:0 10px 0 0;font-size:16px}
+.gbar h2 small{display:block;font-weight:400;font-size:12px;color:var(--muted)}
+.gbar .seg{margin:0}
+.gbar .sp{flex:1}
+.gbody{overflow:auto;padding:2px 4px 16px;flex:1}
+.gcard{display:grid;grid-template-columns:minmax(240px,290px) 1fr 1fr;gap:6px 20px;background:var(--card);border:1px solid var(--line);border-radius:10px;padding:14px 16px;margin:12px;scroll-margin-top:12px;transition:box-shadow .3s}
+.gcard h3{grid-column:1/-1;margin:0 0 4px;font-size:15px}
+.gcard.flash{box-shadow:0 0 0 3px color-mix(in srgb,var(--accent) 50%,transparent)}
+.gcol h4{margin:0 0 6px;font-size:11px;text-transform:uppercase;letter-spacing:.6px;color:var(--muted)}
+.gcol ol{margin:0;padding-left:18px;font-size:13px;line-height:1.45}
+.gcol li{margin:0 0 5px}
+.gi{border-left:3px solid var(--line);padding:2px 0 2px 10px;margin:0 0 8px;font-size:13px;line-height:1.4}
+.gi b{display:block;font-size:12.5px}
+.gi.ok{border-color:var(--ok)}.gi.warn{border-color:var(--warn)}.gi.bad{border-color:var(--bad)}
+.gsrc{font-size:11px;color:var(--muted);margin:8px 0 0}
+.gfig{width:100%;height:auto;display:block;background:var(--bg);border:1px solid var(--line);border-radius:8px}
+.gfig .tis{fill:var(--g-tis);stroke:var(--g-line);stroke-width:1.2}
+.gfig .endo{fill:var(--g-endo)}
+.gfig .canal{stroke:var(--g-endo);stroke-width:2.2}
+.gfig .fluid,.gfig .fol{fill:var(--g-fluid)}
+.gfig .fluidL{fill:var(--g-fluidL)}
+.gfig .cap,.gfig .wall{fill:var(--g-tis);stroke:var(--g-line);stroke-width:1}
+.gfig .ov{fill:var(--g-ov);stroke:var(--g-line);stroke-width:1.2}
+.gfig .solid{fill:var(--g-solid);stroke:var(--g-line);stroke-width:.8}
+.gfig .sep{fill:none;stroke:var(--g-sep);stroke-width:2.4;stroke-linecap:round}
+.gfig .flow{fill:none;stroke:var(--g-flow);stroke-width:2;stroke-linecap:round}
+.gfig .shad{fill:var(--g-shadow)}
+.gfig .shadL{fill:none;stroke:var(--g-shadow);stroke-width:3}
+.gfig .enh{fill:var(--g-enh)}
+.gfig .blad{fill:var(--g-blad);stroke:var(--g-line)}
+.gfig .fib{fill:var(--g-fib);stroke:var(--g-line);stroke-width:1.2}
+.gfig .whorl{fill:none;stroke:var(--g-line);stroke-width:1;opacity:.7}
+.gfig .cav{fill:var(--g-cav)}
+.gfig .lead{stroke:var(--muted);stroke-width:1}
+.gfig .dash{stroke-dasharray:3 2}
+.gfig .beam{fill:none;stroke:var(--muted);stroke-width:1.4}
+.gfig .cal{stroke:var(--g-cal);stroke-width:1.3;stroke-dasharray:3 2.5}
+.gfig .calx{stroke:var(--g-cal);stroke-width:1.6}
+.gfig text{font:500 8.4px -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;fill:var(--ink);paint-order:stroke;stroke:var(--bg);stroke-width:3px;stroke-linejoin:round}
+.gfig .calt{fill:var(--g-cal);font-weight:700;font-size:9.5px}
+.gfig .gk{font-size:7.6px;letter-spacing:.7px;fill:var(--muted);font-weight:600}
+.gfig .gform{font-size:10.5px;font-weight:700}
+.gfig .b{font-weight:700}
+.gfig .gn{fill:#fff;stroke:none;font-size:7px;font-weight:700}
+.gfig .gn2{fill:#fff;stroke:none;font-size:11px;font-weight:700}
+#printGuide{display:none}
+@media (max-width:900px){.gcard{grid-template-columns:1fr}.gfigw{max-width:420px}}
+@media print{
+  body.pg > *:not(#printGuide){display:none!important}
+  body.pg #printGuide{display:block!important}
+  #printGuide h1{font-size:18px;margin:0 0 8px}
+  #printGuide .gcard{grid-template-columns:200px 1fr 1fr!important;break-inside:avoid;margin:0 0 10px;border:1px solid #bbb}
+  #printGuide .gcol{font-size:11px}
+  header,.form,.bar,.summary,.disc-screen,.p3d{display:none!important}
+  .app{display:block;padding:0}
+  .out{position:static;max-height:none;overflow:visible}
+  .card{border:0;padding:0}
+  pre#report{border:0;background:#fff;color:#000;font-size:11pt}
+}
+</style>
+</head>
+<body>
+<header>
+  <h1>SakitaGYNUSreporter<small>O-RADS US v2022 · IOTA 2026 terms + two-step · FIGO 0–8 · MUSA</small></h1>
+  <button id="btnGuide">Measurement guide</button>
+  <button id="btnExample">Load example</button>
+  <button id="btnNew">New case</button>
+  <button id="btnTheme" title="Toggle light/dark">◐</button>
+</header>
+
+<div class="app">
+  <main class="form">
+    <section class="card" id="secPt"></section>
+    <section class="card" id="secUt"></section>
+    <section class="card" id="secOv"></section>
+    <section class="card" id="secLes"></section>
+    <section class="card" id="secGl"></section>
+    <section class="card" id="secSet"></section>
+  </main>
+
+  <aside class="out">
+    <section class="card p3d">
+      <h2>3D pictogram</h2>
+      <div class="seg" id="v3tabs"><button data-v="case">Pelvis · this case</button><button data-v="figo">FIGO reference</button><button data-v="iota">IOTA reference</button></div><div class="seg" id="v3views"><button data-view="cor" title="Coronal plane of the uterus, as reconstructed in 3D ultrasound">Coronal (uterine)</button><button data-view="sag" title="Mid-sagittal plane of the pelvis">Sagittal</button><button data-view="obl">Oblique</button><button data-view="top">Top</button></div>
+      <div id="v3layers" class="layers"><label class="c"><input type="checkbox" id="v3ctx" data-p="ui.ctx"> Ligaments, vessels &amp; bladder</label><label class="c"><input type="checkbox" id="v3art" data-p="ui.art"> Arterial supply</label><label class="c"><input type="checkbox" id="v3det" data-p="ui.det"> Lesion feature labels</label></div>
+      <div class="v3wrap">
+        <canvas id="v3" aria-label="Interactive 3D pictogram"></canvas>
+        <span class="v3hint">Drag to rotate · scroll or pinch to zoom · double-click to reset</span>
+        <div class="v3tools"><button id="v3lbl" aria-pressed="true" title="Show or hide labels (L)">Labels</button><button id="v3auto">⟳ Auto-rotate</button><button id="v3reset">Reset view</button></div>
+      </div>
+      <div class="legend" id="v3legend"></div>
+      <p class="hint" id="v3cap" style="margin:6px 0 0"></p>
+      <p class="hint v3abbr" id="v3abbr"></p>
+    </section>
+    <section class="card">
+      <h2>Structured report</h2>
+      <div class="summary" id="summary"></div>
+      <div class="bar">
+        <button class="primary" id="btnCopy">Copy report</button>
+        <button id="btnPrint">Print</button>
+        <span class="sp"></span>
+      </div>
+      <pre id="report"></pre>
+      <p class="disc">Decision-support only. Categories are generated from the rules in this tool and must be verified by the reporting clinician against the official ACR O-RADS US v2022 tables and IOTA guidance. ADNEX risk must come from the official IOTA ADNEX calculator; this tool does not compute it.</p>
+      <ul class="ref">
+        <li>Timmerman D, et al. Terms, definitions and measurements to describe the sonographic features of adnexal tumors: updated IOTA consensus. Ultrasound Obstet Gynecol 2026;67:702–724.</li>
+        <li>ACR O-RADS US Risk Stratification and Management System v2022.</li>
+        <li>Munro MG, et al. FIGO leiomyoma subclassification (PALM-COEIN), types 0–8.</li>
+        <li>Van den Bosch T, et al. MUSA consensus terms for myometrial lesions. Ultrasound Obstet Gynecol 2015.</li>
+      </ul>
+    </section>
+  </aside>
+</div>
+<dialog id="guide" class="guide" aria-label="Measurement guide">
+  <div class="gbar"><h2>Measurement guide<small>Definition, protocol and interpretation for each parameter</small></h2><div class="seg" id="gfilter"></div><span class="sp"></span><button id="gprint">Print guide</button><button class="primary" id="gclose">Close</button></div>
+  <div class="gbody" id="gbody"></div>
+</dialog>
+<div class="toast" id="toast"></div>
+
+<script>
+"use strict";
+/* ---------------- state ---------------- */
+const LS = "gyn-us-reporter-v1";
+const today = () => new Date().toISOString().slice(0,10);
+function defaults(){
+  return {
+    pt:{date:today(),age:"",meno:"pre",cycle:"",ca125:"",indication:"",approach:"TVS",doppler:true,vis:"adequate",center:"non-oncology"},
+    ut:{pos:"anteverted",l:"",w:"",ap:"",et:"",etDesc:"",utNotes:""},
+    fib:[],
+    ov:{R:{vis:"visualized",l:"",w:"",h:"",fol:"",notes:""},L:{vis:"visualized",l:"",w:"",h:"",fol:"",notes:""}},
+    les:[],
+    gl:{ascites:false,nodules:false,pod:"none",other:""},
+    set:{bilocular:"2",primary:"both"},
+    ui:{v:"case",ctx:true,art:false,det:false}
+  };
+}
+function newFib(){return {loc:"posterior",l:"",w:"",h:"",endo:"none",sero:"none",ect:"none",echo:"hypoechoic",margin:"well-defined",shadow:"edge shadows",vasc:"circumferential",cs:"",im:"",om:"",cystic:false,calc:false,notes:""}}
+function newLes(){return {side:"Right",origin:"ovarian",d1:"",d2:"",d3:"",phys:"none",classic:"none",loc:"1",solidTumor:false,contour:"smooth",contents:"anechoic",pp:"0",flat:false,otherSolid:false,tiny:false,s1:"",s2:"",s3:"",ph:"",pb1:"",pb2:"",cs:"",shadow:false,incomplete:false,adnex:"",notes:""}}
+function load(){
+  try{
+    const raw = localStorage.getItem(LS); if(!raw) return defaults();
+    const o = JSON.parse(raw), d = defaults();
+    for(const k of ["pt","ut","gl","set","ui"]) d[k] = Object.assign(d[k], o[k]||{});
+    if(o.ov){ d.ov.R = Object.assign(d.ov.R,o.ov.R||{}); d.ov.L = Object.assign(d.ov.L,o.ov.L||{}); }
+    d.fib = (o.fib||[]).map(f=>Object.assign(newFib(),f));
+    d.les = (o.les||[]).map(l=>Object.assign(newLes(),l));
+    return d;
+  }catch(e){ return defaults(); }
+}
+let S = load();
+function save(){ try{ localStorage.setItem(LS, JSON.stringify(S)); }catch(e){} }
+
+/* ---------------- helpers ---------------- */
+const $ = id => document.getElementById(id);
+const esc = s => String(s==null?"":s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const getP = p => p.split(".").reduce((a,k)=>a==null?a:a[k], S);
+function setP(p,v){ const ks=p.split("."); let a=S; for(let i=0;i<ks.length-1;i++) a=a[ks[i]]; a[ks[ks.length-1]]=v; }
+const num = v => { const x = parseFloat(v); return isFinite(x) && x > 0 ? x : null; };
+const f1 = x => x==null ? "—" : (Math.round(x*10)/10).toFixed(1);
+const f0 = x => x==null ? "—" : String(Math.round(x));
+const vol = (a,b,c) => (a&&b&&c) ? a*b*c*0.523 : null;
+
+function fNum(p,label,unit,step){ return `<label class="f"><span>${label}</span><div class="inp"><input type="number" inputmode="decimal" step="${step||"any"}" min="0" data-p="${p}" value="${esc(getP(p))}">${unit?`<em>${unit}</em>`:""}</div></label>`; }
+function fTxt(p,label,ph){ return `<label class="f"><span>${label}</span><div class="inp"><input type="text" data-p="${p}" placeholder="${esc(ph||"")}" value="${esc(getP(p))}"></div></label>`; }
+function fDate(p,label){ return `<label class="f"><span>${label}</span><div class="inp"><input type="date" data-p="${p}" value="${esc(getP(p))}"></div></label>`; }
+function fSel(p,label,opts){ const v=getP(p); return `<label class="f"><span>${label}</span><div class="inp"><select data-p="${p}">${opts.map(o=>{const [val,txt]=Array.isArray(o)?o:[o,o];return `<option value="${esc(val)}"${String(v)===String(val)?" selected":""}>${esc(txt)}</option>`}).join("")}</select></div></label>`; }
+function fChk(p,label){ return `<label class="c"><input type="checkbox" data-p="${p}"${getP(p)?" checked":""}><span>${label}</span></label>`; }
+const orBadge = c => c==null ? `<span class="or orx">O-RADS ?</span>` : `<span class="or or${c}">O-RADS ${c}</span>`;
+
+/* ---------------- render forms ---------------- */
+function renderPt(){
+  $("secPt").innerHTML = `<h2><span class="n">1</span>Patient &amp; technique</h2>
+  <div class="grid">
+    ${fDate("pt.date","Exam date")}
+    ${fNum("pt.age","Age","y","1")}
+    ${fSel("pt.meno","Menopausal status",[["pre","Premenopausal"],["post","Postmenopausal"]])}
+    ${fTxt("pt.cycle","LMP / cycle day","e.g. D21")}
+    ${fNum("pt.ca125","CA-125 (optional)","U/mL")}
+    ${fSel("pt.approach","Approach",[["TVS","Transvaginal"],["TAS","Transabdominal"],["TVS+TAS","Transvaginal + transabdominal"],["TRS","Transrectal"]])}
+    ${fSel("pt.vis","Visualization",[["adequate","Adequate"],["limited","Limited"]])}
+    ${fSel("pt.center","Type of center (ADNEX)",[["non-oncology","Non-oncology center"],["oncology","Oncology center"]])}
+  </div>
+  <div class="grid w">${fTxt("pt.indication","Indication","e.g. pelvic pain, AUB, follow-up")}</div>
+  ${fChk("pt.doppler","Color/power Doppler performed")}
+  <p class="hint">Oncology center = tertiary referral center with a gyn-oncology unit, for patients referred for gyn-oncology care (IOTA 2026).</p>`;
+}
+function renderUt(){
+  const fibs = S.fib.map((f,i)=>`
+    <div class="sub" data-fib="${i}">
+      <div class="sub-h">Fibroid F${i+1}<span class="sp"></span><button class="del" data-delfib="${i}" title="Remove">Remove</button></div>
+      <div class="grid">
+        ${fSel(`fib.${i}.loc`,"Location",["anterior","posterior","fundal","right lateral","left lateral","right cornual","left cornual","cervical","isthmic"])}
+        ${fNum(`fib.${i}.l`,"Length","cm")}${fNum(`fib.${i}.w`,"Width","cm")}${fNum(`fib.${i}.h`,"Height (AP)","cm")}
+      </div>
+      <fieldset><legend>FIGO position</legend><div class="grid w">
+        ${fSel(`fib.${i}.endo`,"Endometrial / cavity side",[["none","No contact with endometrium"],["contact","Contacts endometrium, no cavity distortion (3)"],["0","Submucosal, pedunculated, 100% intracavitary (0)"],["1","Submucosal, <50% intramural (1)"],["2","Submucosal, ≥50% intramural (2)"]])}
+        ${fSel(`fib.${i}.sero`,"Serosal side",[["none","No serosal involvement"],["5","Subserosal, ≥50% intramural (5)"],["6","Subserosal, <50% intramural (6)"],["7","Subserosal, pedunculated (7)"]])}
+        ${fSel(`fib.${i}.ect`,"Ectopic / other (8)",[["none","No"],["cervical","Cervical"],["broad ligament","Broad ligament"],["parasitic","Parasitic"],["other","Other"]])}
+      </div></fieldset>
+      <fieldset><legend>MUSA features</legend><div class="grid">
+        ${fSel(`fib.${i}.echo`,"Echogenicity",["hypoechoic","isoechoic","hyperechoic","heterogeneous (mixed)"])}
+        ${fSel(`fib.${i}.margin`,"Margins",["well-defined","ill-defined"])}
+        ${fSel(`fib.${i}.shadow`,"Shadowing",["edge shadows","internal fan-shaped shadows","edge + internal fan-shaped shadows","none"])}
+        ${fSel(`fib.${i}.vasc`,"Vascular pattern",["circumferential","intralesional","circumferential + intralesional","none detected"])}
+        ${fSel(`fib.${i}.cs`,"Color score",[["","—"],["1","1 (none)"],["2","2 (minimal)"],["3","3 (moderate)"],["4","4 (abundant)"]])}
+        ${fNum(`fib.${i}.im`,"Inner margin (to endometrium)","mm")}
+        ${fNum(`fib.${i}.om`,"Outer margin (to serosa)","mm")}
+      </div>
+      ${fChk(`fib.${i}.cystic`,"Cystic areas")}${fChk(`fib.${i}.calc`,"Calcification")}
+      </fieldset>
+      <div class="grid w">${fTxt(`fib.${i}.notes`,"Notes","")}</div>
+      <div class="calc" id="fibcalc${i}"></div>
+    </div>`).join("");
+  $("secUt").innerHTML = `<h2><span class="n">2</span>Uterus &amp; fibroids<button class="glink" data-gg="ut">Measurement guide</button></h2>
+    <div class="grid">
+      ${fSel("ut.pos","Position",["anteverted","retroverted","axial","anteverted, anteflexed","retroverted, retroflexed"])}
+      ${fNum("ut.l","Length","cm")}${fNum("ut.w","Width","cm")}${fNum("ut.ap","AP","cm")}
+      ${fNum("ut.et","Endometrial thickness","mm")}
+    </div>
+    <div class="grid w">${fTxt("ut.etDesc","Endometrium description","e.g. trilaminar, regular")}${fTxt("ut.utNotes","Other uterine findings","")}</div>
+    <div class="calc" id="utcalc"></div>
+    <div style="margin-top:10px">${fibs}</div>
+    <button class="ghost" id="addFib">+ Add fibroid</button>`;
+}
+function renderOv(){
+  const side = s => `<div class="sub"><div class="sub-h">${s==="R"?"Right":"Left"} ovary</div><div class="grid">
+    ${fSel(`ov.${s}.vis`,"Status",[["visualized","Visualized"],["not visualized","Not visualized"],["absent","Surgically absent"]])}
+    ${fNum(`ov.${s}.l`,"Length","cm")}${fNum(`ov.${s}.w`,"Width","cm")}${fNum(`ov.${s}.h`,"Height","cm")}
+    ${fNum(`ov.${s}.fol`,"Antral follicles","n","1")}</div>
+    <div class="grid w">${fTxt(`ov.${s}.notes`,"Notes","")}</div><div class="calc" id="ovcalc${s}"></div></div>`;
+  $("secOv").innerHTML = `<h2><span class="n">3</span>Ovaries<button class="glink" data-gg="ov">Measurement guide</button></h2>${side("R")}${side("L")}
+  <p class="hint">Volume = L × W × H × 0.523. Flagged enlarged if &gt;20 mL (premenopausal) or &gt;10 mL (postmenopausal).</p>`;
+}
+function renderLes(){
+  const les = S.les.map((L,i)=>`
+  <div class="sub">
+    <div class="sub-h">Lesion A${i+1}<span class="sp"></span><button class="del" data-delles="${i}">Remove</button></div>
+    <div class="grid">
+      ${fSel(`les.${i}.side`,"Side",["Right","Left","Midline / uncertain"])}
+      ${fSel(`les.${i}.origin`,"Origin",[["ovarian","Ovarian"],["paraovarian","Paraovarian"],["tubal","Tubal"],["extra-ovarian","Extra-ovarian, other"],["uncertain","Uncertain"]])}
+      ${fNum(`les.${i}.d1`,"Diameter 1","mm")}${fNum(`les.${i}.d2`,"Diameter 2","mm")}${fNum(`les.${i}.d3`,"Diameter 3","mm")}
+    </div>
+    <p class="hint">Three orthogonal diameters in two perpendicular planes; include the capsule if visible.</p>
+    <div class="grid w">
+      ${fSel(`les.${i}.phys`,"Physiologic finding",[["none","No — this is a lesion"],["follicle","Follicle"],["cl","Corpus luteum"]])}
+      ${fSel(`les.${i}.classic`,"ACR classic benign appearance",[["none","None"],["hemorrhagic","Typical hemorrhagic cyst"],["dermoid","Typical dermoid cyst"],["endometrioma","Typical endometrioma"],["paraovarian","Paraovarian cyst"],["pic","Peritoneal inclusion cyst"],["hydrosalpinx","Hydrosalpinx"]])}
+    </div>
+    <div class="grid">
+      ${fSel(`les.${i}.loc`,"Cyst locules",[["1","1 (unilocular)"],["2","2 (bilocular)"],["3-10","3–10"],[">10",">10"]])}
+      ${fSel(`les.${i}.contents`,"Cyst contents",[["anechoic","Anechoic"],["low-level","Low-level"],["ground-glass","Ground-glass"],["hemorrhagic","Hemorrhagic"],["mixed","Mixed (dermoid-like)"],["variable","Variable between locules"],["none","N/A (solid)"]])}
+      ${fSel(`les.${i}.cs`,"Color score (worst area)",[["","—"],["1","1 (no flow)"],["2","2 (minimal)"],["3","3 (moderate)"],["4","4 (abundant)"]])}
+    </div>
+    ${fChk(`les.${i}.incomplete`,"<b>Not classifiable / poorly visualized</b> (O-RADS 0)")}
+    <p class="hint">A cyst with only incomplete septa (e.g. hydrosalpinx) counts as unilocular.</p>
+    <fieldset><legend>Solid tissue (IOTA 2026). Exclude white ball, sludge, clot, mucus, septa, ovarian stroma</legend>
+      ${fChk(`les.${i}.solidTumor`,"<b>Solid tumor</b>: solid tissue ≥80% of lesion volume")}
+      <div class="grid">
+        ${fSel(`les.${i}.contour`,"Solid tumor contour",[["smooth","Smooth / regular"],["irregular","Irregular (angles <90°, lobulated, spiculated, or irregular internal cyst)"]])}
+        ${fSel(`les.${i}.pp`,"Papillary projections (height ≥3 mm)",[["0","0"],["1","1"],["2","2"],["3","3"],["4","≥4"]])}
+      </div>
+      ${fChk(`les.${i}.flat`,"Protrusion &lt;3 mm high but base ≥3 mm: IOTA solid component; ACR wall irregularity")}
+      ${fChk(`les.${i}.otherSolid`,"Other solid tissue ≥3 mm in any diameter, non-protruding")}
+      ${fChk(`les.${i}.tiny`,"Wall irregularity only: all diameters &lt;3 mm, not explained by sludge/hair")}
+      <div class="grid">
+        ${fNum(`les.${i}.s1`,"Largest solid comp. D1","mm")}${fNum(`les.${i}.s2`,"D2","mm")}${fNum(`les.${i}.s3`,"D3","mm")}
+        ${fNum(`les.${i}.ph`,"Largest PP height","mm")}${fNum(`les.${i}.pb1`,"PP base 1","mm")}${fNum(`les.${i}.pb2`,"PP base 2","mm")}
+      </div>
+      <p class="hint">Peaks count as one projection if the valley between them is ≥50% of the lower peak's height. Don't include wall or septum thickness in the height.</p>
+    </fieldset>
+    ${fChk(`les.${i}.shadow`,"Internal acoustic shadowing. Edge shadows and gradual attenuation don't count")}
+    <div class="grid w">
+      ${fNum(`les.${i}.adnex`,"ADNEX total risk of malignancy (from IOTA calculator)","%")}
+      ${fTxt(`les.${i}.notes`,"Notes","")}
+    </div>
+    <div class="cls" id="lescls${i}"></div>
+  </div>`).join("");
+  $("secLes").innerHTML = `<h2><span class="n">4</span>Adnexal lesions<button class="glink" data-gg="ad">Measurement guide</button></h2>${les}<button class="ghost" id="addLes">+ Add adnexal lesion</button>`;
+}
+function renderGl(){
+  $("secGl").innerHTML = `<h2><span class="n">5</span>Pelvis<button class="glink" data-guide="ascites">Measurement guide</button></h2>
+  ${fChk("gl.ascites","<b>Ascites</b>: fluid beyond the pouch of Douglas (between bladder and uterus, above the fundus, or in Morison's pouch)")}
+  ${fChk("gl.nodules","Peritoneal nodules / carcinomatosis")}
+  <div class="grid w">${fSel("gl.pod","Pouch of Douglas fluid (descriptive)",[["none","None"],["small","Small amount"],["moderate","Moderate"]])}${fTxt("gl.other","Other findings","")}</div>`;
+}
+function renderSet(){
+  $("secSet").innerHTML = `<h2><span class="n">6</span>Rule settings</h2>
+  <div class="grid w">
+    ${fSel("set.primary","Category used for impression & management",[["both","Both systems; manage by the higher"],["iota","IOTA two-step (BD + ADNEX)"],["acr","ACR O-RADS US v2022 lexicon"]])}
+    ${fSel("set.bilocular","ACR: smooth bilocular cyst <10 cm, no solid",[["2","O-RADS 2 (grouped with smooth non-simple unilocular)"],["3","O-RADS 3 (as in original prompt)"]])}
+  </div>
+  <p class="hint">Check the bilocular rule against the official ACR v2022 table. The two sources disagree, so you choose.</p>`;
+}
+function renderAll(){ renderPt(); renderUt(); renderOv(); renderLes(); renderGl(); renderSet(); update(); }
+
+/* ---------------- calculations ---------------- */
+const FIGO_DESC = {"0":"submucosal, pedunculated, intracavitary","1":"submucosal, <50% intramural","2":"submucosal, ≥50% intramural","3":"100% intramural, contacts endometrium","4":"100% intramural","5":"subserosal, ≥50% intramural","6":"subserosal, <50% intramural","7":"subserosal, pedunculated","8":"other / ectopic"};
+function fibCalc(f){
+  const l=num(f.l),w=num(f.w),h=num(f.h), ds=[l,w,h].filter(Boolean);
+  const max = ds.length ? Math.max(...ds) : null, v = vol(l,w,h);
+  let code, desc, warns=[], flags=[];
+  if(f.ect!=="none"){ code="8"; desc=`other / ectopic (${f.ect})`; }
+  else{
+    const e = ({"0":"0","1":"1","2":"2","contact":"3"})[f.endo] || null;
+    const s = ({"5":"5","6":"6","7":"7"})[f.sero] || null;
+    if(e && s){ code=`${e}–${s}`; desc=`hybrid: ${FIGO_DESC[e]} / ${FIGO_DESC[s]}`; if(e==="0"||s==="7") warns.push("Pedunculated types (0, 7) are not normally combined in hybrid notation. Recheck."); }
+    else { code = e || s || "4"; desc = FIGO_DESC[code]; }
+  }
+  const im=num(f.im), om=num(f.om), sub=["0","1","2"].includes(f.endo);
+  if(f.im!=="" && im!=null && im<5) flags.push(`Inner myometrial margin ${f1(im)} mm (<5 mm)`);
+  if(f.im!=="" && parseFloat(f.im)===0) flags.push("Inner myometrial margin 0 mm");
+  if(sub && om!=null && om<5) flags.push(`Outer (serosal) margin ${f1(om)} mm (<5 mm): reduced safety margin for hysteroscopic resection`);
+  if(f.margin==="ill-defined") warns.push("Ill-defined margins: MUSA differential includes adenomyoma. Correlate.");
+  return {l,w,h,max,v,code,desc,warns,flags,im,om};
+}
+function ovCalc(o,meno){
+  const l=num(o.l),w=num(o.w),h=num(o.h), v=vol(l,w,h), lim = meno==="post"?10:20;
+  return {v, lim, enlarged: v!=null && v>lim};
+}
+const LOCNAME = {"1":"Unilocular","2":"Bilocular","3-10":"Multilocular",">10":"Multilocular"};
+const CLASSIC = {hemorrhagic:"hemorrhagic cyst",dermoid:"dermoid cyst",endometrioma:"endometrioma",paraovarian:"paraovarian cyst",pic:"peritoneal inclusion cyst",hydrosalpinx:"hydrosalpinx"};
+
+function lesCalc(L){
+  const meno=S.pt.meno, d=[num(L.d1),num(L.d2),num(L.d3)], dd=d.filter(Boolean);
+  const maxmm = dd.length ? Math.max(...dd) : null;
+  const avgcm = dd.length===3 ? (d[0]+d[1]+d[2])/3/10 : null;
+  const v = dd.length===3 ? d[0]*d[1]*d[2]/1000*0.523 : null;
+  const pp = parseInt(L.pp)||0, cs = L.cs ? +L.cs : null, notes=[];
+  const sd=[num(L.s1),num(L.s2),num(L.s3),num(L.ph)].filter(Boolean);
+  const iotaSolid = pp>0 || L.flat || L.otherSolid || L.solidTumor;
+  const maxSolid = iotaSolid ? (sd.length ? Math.max(...sd) : (L.solidTumor ? maxmm : null)) : 0;
+  const ph = num(L.ph), pb1=num(L.pb1), pb2=num(L.pb2);
+
+  // consistency checks
+  if(ph!=null && ph>=3 && pp===0) notes.push("A projection height ≥3 mm is entered but the papillary projection count is 0.");
+  if(ph!=null && ph<3 && pp>0) notes.push("Papillary projection height is <3 mm. By IOTA definition it's not a papillary projection.");
+  if(ph!=null && ph<3 && ((pb1&&pb1>=3)||(pb2&&pb2>=3)) && !L.flat) notes.push("Protrusion <3 mm high with base ≥3 mm counts as a solid component (IOTA 2026). Tick the matching box.");
+  if(L.classic!=="none" && (pp>0||L.otherSolid||L.flat||L.tiny)) notes.push("Classic benign label was ignored because solid tissue or wall irregularity is present.");
+  if(L.solidTumor && L.loc!=="1") notes.push("Solid tumor: locules aren't counted (ADNEX '>10 locules' = No).");
+  if(L.flat && !(pp>0||L.otherSolid||L.solidTumor)) notes.push("ACR and IOTA differ here: ACR reads the flat protrusion as wall irregularity, IOTA as a solid component (unilocular-solid → ADNEX).");
+
+  /* ---- ACR O-RADS US v2022 ---- */
+  const A = (cat,rule,mgmt)=>({cat,rule,mgmt});
+  let acr;
+  const big = maxmm!=null && maxmm>=100;
+  const ascN = S.gl.ascites||S.gl.nodules;
+  if(L.incomplete) acr=A(0,"Incomplete evaluation");
+  else if(maxmm==null) acr=A(null,"Enter lesion diameters");
+  else{
+    if(L.phys!=="none" && meno==="pre" && maxmm<=30) acr=A(1, L.phys==="follicle"?"Follicle ≤3 cm, premenopausal":"Corpus luteum ≤3 cm, premenopausal");
+    else{
+      if(L.phys!=="none") notes.push("Physiologic label applies only to premenopausal lesions ≤3 cm, so it was ignored for ACR.");
+      const acrSolid = pp>0 || L.otherSolid;
+      const irr = L.flat || L.tiny;
+      if(L.solidTumor){
+        if(L.contour==="irregular") acr=A(5,"Solid lesion, irregular outer contour");
+        else if(cs==null) acr=A(null,"Solid smooth lesion: color score required");
+        else if(cs===4) acr=A(5,"Solid smooth lesion, CS 4");
+        else if(L.shadow) acr=A(3,`Solid smooth lesion with acoustic shadowing (CS ${cs})`);
+        else if(cs===1) acr=A(3,"Solid smooth lesion, CS 1");
+        else acr=A(4,`Solid smooth lesion, CS ${cs}, no shadowing`);
+      } else if(acrSolid){
+        if(L.loc==="1"||L.loc==="2"){
+          acr = pp>=4 ? A(5,`${LOCNAME[L.loc]} cyst with ≥4 papillary projections`) : A(4,`${LOCNAME[L.loc]} cyst with solid component (${pp?pp+" papillary projection"+(pp>1?"s":""):"non-papillary"})`);
+        } else if(cs==null) acr=A(null,"Multilocular cyst with solid component: color score required");
+        else acr = cs<=2 ? A(4,`Multilocular cyst with solid component, CS ${cs}`) : A(5,`Multilocular cyst with solid component, CS ${cs}`);
+      } else {
+        if(["hemorrhagic","dermoid","endometrioma"].includes(L.classic) && !irr)
+          acr = big ? A(3,`Classic ${CLASSIC[L.classic]} ≥10 cm`) : A(2,`Classic ${CLASSIC[L.classic]} <10 cm`);
+        else if(["paraovarian","pic","hydrosalpinx"].includes(L.classic) && !irr)
+          acr = A(2,`Classic ${CLASSIC[L.classic]}`);
+        else if(L.loc==="1"){
+          if(irr) acr=A(3,"Unilocular cyst, irregular inner wall (<3 mm height)");
+          else if(L.contents==="anechoic"){
+            if(big) acr=A(3,"Simple cyst ≥10 cm");
+            else if(meno==="pre" && maxmm<=30) acr=A(1,"Simple cyst ≤3 cm, premenopausal (follicle)");
+            else acr=A(2,"Simple cyst <10 cm");
+          } else acr = big ? A(3,"Unilocular smooth non-simple cyst ≥10 cm") : A(2,"Unilocular smooth non-simple cyst <10 cm");
+        } else if(L.loc==="2"){
+          if(irr) acr=A(3,"Bilocular cyst, irregular inner wall (<3 mm height)");
+          else if(big) acr=A(3,"Bilocular smooth cyst ≥10 cm");
+          else acr=A(+S.set.bilocular,`Bilocular smooth cyst <10 cm (setting: O-RADS ${S.set.bilocular})`);
+        } else {
+          if(big) acr=A(4,"Multilocular cyst ≥10 cm, no solid component");
+          else if(irr) acr=A(4,"Multilocular cyst, irregular inner wall/septation");
+          else if(cs==null) acr=A(null,"Multilocular smooth cyst <10 cm: color score required");
+          else acr = cs===4 ? A(4,"Multilocular smooth cyst <10 cm, CS 4") : A(3,`Multilocular smooth cyst <10 cm, CS ${cs}`);
+        }
+      }
+    }
+    if(ascN && acr.cat!=null && acr.cat>=2){ acr=A(5, acr.rule+"; with ascites and/or peritoneal nodules"); notes.push("Ascites/peritoneal nodules upgrade to O-RADS 5. Exclude non-neoplastic causes."); }
+  }
+  acr.mgmt = acrMgmt(acr.cat, L, maxmm, meno);
+
+  /* ---- IOTA two-step ---- */
+  let iota = {};
+  const type = L.solidTumor ? "solid tumor" : (L.loc==="1" ? (iotaSolid?"unilocular-solid":"unilocular") : (iotaSolid?"multilocular-solid":"multilocular"));
+  iota.type = type;
+  if(L.incomplete){ iota = {type:"not classifiable",cat:0,rule:"Not classifiable (poor visualization)"}; }
+  else if(L.phys!=="none"){ iota = {type:"physiologic",cat:1,rule:(L.phys==="follicle"?"Follicle":"Corpus luteum")+": functional finding, not a lesion"}; }
+  else if(maxmm==null){ iota.cat=null; iota.rule="Enter lesion diameters"; }
+  else{
+    const regular = !L.tiny;
+    if(type==="unilocular" && regular && L.contents==="anechoic" && meno==="pre" && maxmm<=30){
+      Object.assign(iota,{cat:1,presumed:"follicle",rule:"Simple cyst ≤3 cm, premenopausal: consistent with a follicle (not a lesion)"});
+    } else if(type==="unilocular" && regular && maxmm<100){
+      const pre = meno==="pre";
+      if(L.contents==="ground-glass" && pre) Object.assign(iota,{bd:"BD1",presumed:"endometrioma"});
+      else if(L.contents==="mixed" && L.shadow && pre) Object.assign(iota,{bd:"BD2",presumed:"dermoid cyst"});
+      else if(L.contents==="anechoic") Object.assign(iota,{bd:"BD3",presumed:"simple cyst or cystadenoma"});
+      else Object.assign(iota,{bd:"BD4",presumed:"benign unilocular cyst"});
+      iota.cat=2; iota.rule=`${iota.bd}: unilocular, regular walls, <10 cm`;
+    } else {
+      const why=[];
+      if(type!=="unilocular") why.push(type);
+      if(type==="unilocular" && !regular) why.push("irregular inner wall");
+      if(maxmm>=100) why.push("≥10 cm");
+      const a = parseFloat(L.adnex);
+      iota.adnexInputs = {
+        "Age": S.pt.age||"—", "CA-125": S.pt.ca125? S.pt.ca125+" U/mL":"not available", "Type of center": S.pt.center,
+        "Max lesion diameter": f0(maxmm)+" mm", "Max solid component diameter": (maxSolid==null?"— (enter)":f0(maxSolid)+" mm"),
+        ">10 cyst locules": (L.solidTumor?"No (solid tumor)": (L.loc===">10"?"Yes":"No")),
+        "Papillary projections": (pp>=4?"≥4":String(pp)), "Acoustic shadows": L.shadow?"Yes":"No", "Ascites": S.gl.ascites?"Yes":"No"
+      };
+      if(isFinite(a) && a>=0 && a<=100){
+        iota.cat = a<1?2 : a<10?3 : a<50?4 : 5;
+        iota.rule = `No benign descriptor (${why.join(", ")}); ADNEX risk ${a}%`;
+      } else { iota.cat=null; iota.rule=`No benign descriptor (${why.join(", ")}); ADNEX risk needed`; }
+    }
+  }
+  iota.mgmt = iotaMgmt(iota.cat);
+
+  // final per setting
+  let fin;
+  if(S.set.primary==="acr") fin=acr.cat; else if(S.set.primary==="iota") fin=iota.cat;
+  else { const xs=[acr.cat,iota.cat].filter(x=>x!=null); fin = xs.length? Math.max(...xs) : null; }
+
+  let presumed = iota.presumed || (L.classic!=="none" && !(pp>0||L.otherSolid||L.flat||L.tiny) ? CLASSIC[L.classic] : null);
+  if(L.phys==="follicle") presumed="follicle"; if(L.phys==="cl") presumed="corpus luteum";
+  return {maxmm,avgcm,v,pp,cs,iotaSolid,maxSolid,acr,iota,fin,notes,presumed,ph,pb1,pb2};
+}
+
+function acrMgmt(cat,L,maxmm,meno){
+  if(cat==null) return "";
+  if(cat===0) return "Incomplete evaluation: repeat US (by an experienced examiner or another approach) or MRI.";
+  if(cat===1) return "Normal/physiologic: no follow-up required.";
+  if(cat===2){
+    const cm = maxmm/10, pre = meno==="pre";
+    const simple = L.loc==="1" && L.contents==="anechoic" && L.classic==="none";
+    if(simple){
+      if(pre) return cm<=5 ? "Simple cyst ≤5 cm, premenopausal: no further imaging." : "Simple cyst >5 cm and <10 cm, premenopausal: follow-up US (e.g. 8–12 weeks); check the interval against ACR v2022.";
+      return cm<=3 ? "Simple cyst ≤3 cm, postmenopausal: no further imaging." : "Simple cyst >3 cm and <10 cm, postmenopausal: follow-up US (e.g. 12 months); check against ACR v2022.";
+    }
+    if(L.classic==="hemorrhagic") return pre ? (cm<=5?"Hemorrhagic cyst ≤5 cm, premenopausal: no follow-up needed.":"Hemorrhagic cyst >5 cm: follow-up US in 8–12 weeks to confirm resolution.") : "Hemorrhagic-appearing cyst, postmenopausal: follow-up US in 8–12 weeks (consider MRI if persistent).";
+    if(L.classic==="dermoid"||L.classic==="endometrioma") return "Classic benign lesion <10 cm: if not surgically managed, consider follow-up US (e.g. 12 months).";
+    if(["paraovarian","pic","hydrosalpinx"].includes(L.classic)) return "Classic benign lesion: no imaging follow-up required; manage clinically.";
+    return pre ? "Almost certainly benign: if >3 cm, consider follow-up US in 8–12 weeks to confirm resolution." : "Almost certainly benign: consider follow-up US or MRI per ACR v2022 postmenopausal criteria.";
+  }
+  if(cat===3) return "Low risk: US surveillance (e.g. within 6 months) or MRI, or gynecology referral.";
+  if(cat===4) return "Intermediate risk: gynecologist with gyn-oncology consultation, or gyn-oncologist. Consider O-RADS MRI.";
+  if(cat===5) return "High risk: refer to gynecologic oncology.";
+  return "";
+}
+function iotaMgmt(cat){
+  return ({0:"Repeat US by an experienced examiner or MRI.",1:"Normal ovary: conservative management.",2:"Almost certainly benign: conservative management possible if asymptomatic.",3:"Low risk of malignancy: management by local gynecologist.",4:"Intermediate risk: management by gynecological oncologist.",5:"High risk: management by gynecological oncologist."})[cat] || "";
+}
+
+/* ---------------- live UI update ---------------- */
+function update(){
+  tipify();
+  const meno = S.pt.meno;
+  // uterus
+  const uv = vol(num(S.ut.l),num(S.ut.w),num(S.ut.ap));
+  if($("utcalc")) $("utcalc").innerHTML = uv!=null ? `<span class="chip">Uterine volume <b>${f1(uv)} mL</b></span>` : "";
+  S.fib.forEach((f,i)=>{
+    const c=fibCalc(f), el=$("fibcalc"+i); if(!el) return;
+    el.innerHTML = `<span class="chip ok">FIGO <b>Type ${c.code}</b>: ${esc(c.desc)}</span>`
+      + (c.max!=null?`<span class="chip">Largest <b>${f1(c.max)} cm</b></span>`:"")
+      + (c.v!=null?`<span class="chip">Volume <b>${f1(c.v)} mL</b></span>`:"")
+      + c.flags.map(x=>`<span class="chip bad">${esc(x)}</span>`).join("")
+      + c.warns.map(x=>`<span class="chip warn">${esc(x)}</span>`).join("");
+  });
+  ["R","L"].forEach(s=>{
+    const el=$("ovcalc"+s); if(!el) return; const o=S.ov[s], c=ovCalc(o,meno);
+    el.innerHTML = o.vis!=="visualized" ? "" : (c.v!=null ? `<span class="chip ${c.enlarged?"bad":""}">Volume <b>${f1(c.v)} mL</b>${c.enlarged?` (enlarged, &gt;${c.lim} mL)`:""}</span>` : "");
+  });
+  S.les.forEach((L,i)=>{
+    const el=$("lescls"+i); if(!el) return; const c=lesCalc(L);
+    el.innerHTML = `<div class="row"><span class="k">Size</span><span>Largest <b>${f0(c.maxmm)} mm</b> (${f1(c.maxmm!=null?c.maxmm/10:null)} cm) · ALD ${f1(c.avgcm)} cm · Vol ${f1(c.v)} mL</span></div>
+      <div class="row"><span class="k">IOTA</span>${orBadge(c.iota.cat)}<span>${esc(c.iota.type)}: ${esc(c.iota.rule)}</span></div>
+      ${c.iota.adnexInputs?`<div class="row"><span class="k">ADNEX inputs</span><span>${Object.entries(c.iota.adnexInputs).map(([k,v])=>`${esc(k)}: <b>${esc(v)}</b>`).join(" · ")}</span></div>`:""}
+      <div class="row"><span class="k">ACR v2022</span>${orBadge(c.acr.cat)}<span>${esc(c.acr.rule)}</span></div>
+      ${c.notes.map(n=>`<div class="note">${esc(n)}</div>`).join("")}`;
+  });
+  buildReport();
+  refresh3D();
+}
+
+/* ---------------- report ---------------- */
+function buildReport(){
+  const P=S.pt, meno=P.meno, out=[], imp=[], rec=[];
+  const line = s => out.push(s);
+  line("GYNECOLOGIC ULTRASOUND REPORT");
+  line("=".repeat(34));
+  line(`Exam date: ${P.date||"—"}`);
+  line(`Patient: ${P.age?P.age+" y, ":""}${meno==="pre"?"premenopausal":"postmenopausal"}${P.cycle?"; LMP/cycle: "+P.cycle:""}${P.ca125?"; CA-125: "+P.ca125+" U/mL":""}`);
+  if(P.indication) line(`Indication: ${P.indication}`);
+  const appr = ({TVS:"Transvaginal",TAS:"Transabdominal","TVS+TAS":"Transvaginal and transabdominal",TRS:"Transrectal"})[P.approach];
+  line(`Technique: ${appr} grayscale ultrasound${P.doppler?" with color/power Doppler":""}. Visualization: ${P.vis}.`);
+  line("");
+
+  // Uterus
+  line("UTERUS");
+  const U=S.ut, ul=num(U.l),uw=num(U.w),uap=num(U.ap), uv=vol(ul,uw,uap);
+  line(`- ${U.pos[0].toUpperCase()+U.pos.slice(1)}. Size ${ul?f1(ul):"—"} × ${uw?f1(uw):"—"} × ${uap?f1(uap):"—"} cm (L × W × AP)${uv!=null?`; volume ${f1(uv)} mL`:""}.`);
+  if(U.et||U.etDesc) line(`- Endometrium: ${U.et?f1(num(U.et))+" mm":""}${U.et&&U.etDesc?", ":""}${U.etDesc}.`);
+  if(U.utNotes) line(`- ${U.utNotes}`);
+  if(S.fib.length){
+    line(`- Fibroids: ${S.fib.length}`);
+    const fibImp=[];
+    S.fib.forEach((f,i)=>{
+      const c=fibCalc(f);
+      line(`  F${i+1}. ${f.loc[0].toUpperCase()+f.loc.slice(1)}, ${c.l?f1(c.l):"—"} × ${c.w?f1(c.w):"—"} × ${c.h?f1(c.h):"—"} cm${c.max!=null?` (largest ${f1(c.max)} cm`:""}${c.v!=null?`; volume ${f1(c.v)} mL)`:(c.max!=null?")":"")}.`);
+      line(`      FIGO Type ${c.code} (${c.desc}).`);
+      const feats=[f.echo, `${f.margin} margins`, f.shadow==="none"?"no shadowing":f.shadow, `${f.vasc} vascularity${f.cs?` (color score ${f.cs})`:""}`];
+      if(f.cystic) feats.push("cystic areas"); if(f.calc) feats.push("calcification");
+      line(`      MUSA: ${feats.join("; ")}.`);
+      if(f.im!==""||f.om!=="") line(`      Inner myometrial margin ${f.im!==""?f1(parseFloat(f.im))+" mm":"—"}; outer myometrial margin ${f.om!==""?f1(parseFloat(f.om))+" mm":"—"}.`);
+      c.flags.forEach(x=>line(`      ! ${x}`));
+      c.warns.forEach(x=>line(`      * ${x}`));
+      if(f.notes) line(`      ${f.notes}`);
+      fibImp.push(`F${i+1} ${f.loc} ${c.max!=null?f1(c.max)+" cm ":""}FIGO ${c.code}${c.flags.length?" ("+c.flags.map(x=>x.split(":")[0]).join("; ")+")":""}`);
+    });
+    imp.push(`Uterine leiomyoma${S.fib.length>1?"s":""}: ${fibImp.join("; ")}.`);
+    const subm = S.fib.map(fibCalc).filter(c=>/^[012]/.test(c.code));
+    if(subm.length) rec.push("Submucosal fibroid (FIGO 0–2): correlate with bleeding/fertility symptoms; consider hysteroscopic assessment if symptomatic. Review the myometrial margins when planning surgery.");
+    else rec.push("Fibroids: correlate with symptoms; gynecology review if symptomatic.");
+  } else line("- No fibroids identified.");
+  line("");
+
+  // Ovaries
+  line("OVARIES");
+  ["R","L"].forEach(s=>{
+    const o=S.ov[s], name=s==="R"?"Right":"Left";
+    if(o.vis!=="visualized"){ line(`- ${name}: ${o.vis}.`); return; }
+    const c=ovCalc(o,meno), l=num(o.l),w=num(o.w),h=num(o.h);
+    line(`- ${name}: ${l?f1(l):"—"} × ${w?f1(w):"—"} × ${h?f1(h):"—"} cm${c.v!=null?`; volume ${f1(c.v)} mL${c.enlarged?` (ENLARGED: >${c.lim} mL for ${meno}menopausal)`:""}`:""}${o.fol!==""?`; ${o.fol} antral follicles`:""}.${o.notes?" "+o.notes:""}`);
+    if(c.enlarged) imp.push(`${name} ovary enlarged (${f1(c.v)} mL; reference >${c.lim} mL ${meno}menopausal).`);
+  });
+  line("");
+
+  // Lesions
+  line("ADNEXAL LESIONS");
+  let worst=null;
+  if(!S.les.length){
+    line("- No adnexal lesion identified.");
+    const vis = ["R","L"].every(s=>S.ov[s].vis!=="not visualized");
+    imp.push(vis ? "No adnexal lesion; O-RADS 1 (normal ovaries)." : "No adnexal lesion seen; ovary not fully visualized (consider O-RADS 0 if clinically relevant).");
+  }
+  S.les.forEach((L,i)=>{
+    const c=lesCalc(L);
+    const d=[L.d1,L.d2,L.d3].map(x=>num(x)?f0(num(x)):"—").join(" × ");
+    line(`A${i+1}. ${L.side}, ${L.origin}: ${c.iota.type}, ${d} mm.`);
+    line(`    Largest diameter ${f0(c.maxmm)} mm (${f1(c.maxmm!=null?c.maxmm/10:null)} cm); average linear dimension ${f1(c.avgcm)} cm; volume ${f1(c.v)} mL.`);
+    const desc=[];
+    if(L.contents!=="none" && !L.solidTumor) desc.push(`contents ${L.contents}`);
+    if(L.loc!=="1" && !L.solidTumor) desc.push(`${L.loc} locules`);
+    if(L.solidTumor) desc.push(`solid tumor, ${L.contour==="irregular"?"irregular":"smooth"} contour`);
+    desc.push(`inner wall ${(c.pp>0||L.flat||L.tiny)?"irregular":"regular"}`);
+    if(c.pp>0) desc.push(`${c.pp>=4?"≥4":c.pp} papillary projection${c.pp>1?"s":""}${c.ph?` (largest ${f1(c.ph)} mm high, base ${c.pb1?f1(c.pb1):"—"} × ${c.pb2?f1(c.pb2):"—"} mm)`:""}`);
+    if(L.flat) desc.push("flat solid protrusion <3 mm high with base ≥3 mm");
+    if(L.otherSolid) desc.push("non-papillary solid component");
+    if(c.iotaSolid && c.maxSolid) desc.push(`largest solid component ${f0(c.maxSolid)} mm`);
+    if(!c.iotaSolid) desc.push("no solid component");
+    desc.push(L.shadow?"internal acoustic shadowing present":"no internal acoustic shadowing");
+    if(L.cs) desc.push(`color score ${L.cs}`);
+    line(`    Features: ${desc.join("; ")}.`);
+    if(L.notes) line(`    ${L.notes}`);
+    line(`    IOTA two-step: ${c.iota.rule}${c.iota.presumed?` (presumed ${c.iota.presumed})`:""} → ${c.iota.cat==null?"O-RADS pending":"O-RADS "+c.iota.cat}.`);
+    if(c.iota.adnexInputs && c.iota.cat==null) line(`    ADNEX inputs: ${Object.entries(c.iota.adnexInputs).map(([k,v])=>k+" "+v).join("; ")}.`);
+    line(`    ACR O-RADS US v2022: ${c.acr.rule} → ${c.acr.cat==null?"O-RADS pending":"O-RADS "+c.acr.cat}.`);
+    c.notes.forEach(n=>line(`    * ${n}`));
+    const lab = S.set.primary==="acr" ? `ACR O-RADS ${c.acr.cat??"?"}` : S.set.primary==="iota" ? `O-RADS ${c.iota.cat??"?"} (IOTA)` : `O-RADS ${c.fin??"?"} (IOTA ${c.iota.cat??"?"}${c.iota.bd?" "+c.iota.bd:""}; ACR ${c.acr.cat??"?"})`;
+    imp.push(`${L.side} ${L.origin} ${c.iota.type}, ${f1(c.maxmm!=null?c.maxmm/10:null)} cm${c.presumed?`, presumed ${c.presumed}`:""}: ${lab}.`);
+    if(c.fin!=null) worst = worst==null?c.fin:Math.max(worst,c.fin);
+    const mg=[];
+    if(S.set.primary!=="acr" && c.iota.mgmt) mg.push("IOTA: "+c.iota.mgmt);
+    if(S.set.primary!=="iota" && c.acr.mgmt) mg.push("ACR: "+c.acr.mgmt);
+    if(c.iota.cat==null && c.iota.adnexInputs && S.set.primary!=="acr") mg.push("Calculate ADNEX risk (IOTA calculator) to finalize the IOTA category.");
+    if(mg.length) rec.push(`A${i+1}: ${mg.join(" ")}`);
+    line("");
+  });
+
+  // pelvis
+  line("PELVIS");
+  line(`- Ascites: ${S.gl.ascites?"PRESENT":"absent"}. Peritoneal nodules: ${S.gl.nodules?"PRESENT":"not seen"}. Pouch of Douglas fluid: ${S.gl.pod}.`);
+  if(S.gl.other) line(`- ${S.gl.other}`);
+  if(S.gl.ascites||S.gl.nodules) imp.push(`${[S.gl.ascites?"Ascites":"",S.gl.nodules?"peritoneal nodules":""].filter(Boolean).join(" and ")} present.`);
+  line("");
+
+  line("IMPRESSION");
+  imp.forEach((x,i)=>line(`${i+1}. ${x}`));
+  if(worst!=null) line(`   Highest adnexal category: O-RADS ${worst}.`);
+  line("");
+  line("RECOMMENDATIONS");
+  if(!rec.length) rec.push("No specific imaging follow-up required; clinical correlation.");
+  rec.forEach(x=>line(`- ${x}`));
+  line("");
+  line("Standards: IOTA terms & definitions (UOG 2026;67:702-724), IOTA benign descriptors/ADNEX two-step, ACR O-RADS US v2022, FIGO leiomyoma subclassification, MUSA.");
+
+  $("report").textContent = out.join("\n");
+
+  // summary chips
+  const sm=[];
+  sm.push(`<div class="sumcard"><div class="t">Highest O-RADS</div><div class="v">${S.les.length?orBadge(worst):orBadge(1)}</div></div>`);
+  sm.push(`<div class="sumcard"><div class="t">Adnexal lesions</div><div class="v">${S.les.length}</div></div>`);
+  sm.push(`<div class="sumcard"><div class="t">Fibroids</div><div class="v">${S.fib.length?S.fib.map(f=>"FIGO "+fibCalc(f).code).join(", "):"0"}</div></div>`);
+  $("summary").innerHTML = sm.join("");
+}
+
+/* ---------------- measurement guide: textbook infographics ---------------- */
+const gC=(x1,y1,x2,y2,t,tx,ty,a="middle")=>`<line class="cal" x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}"/><path class="calx" d="M${x1-3.5} ${y1}h7M${x1} ${y1-3.5}v7M${x2-3.5} ${y2}h7M${x2} ${y2-3.5}v7"/>${t?`<text class="calt" x="${tx}" y="${ty}" text-anchor="${a}">${t}</text>`:""}`;
+const gT=(x,y,t,c="gs",a="middle")=>`<text class="${c}" x="${x}" y="${y}" text-anchor="${a}">${t}</text>`;
+const gSV=(b,label)=>`<svg class="gfig" viewBox="0 0 260 170" role="img" aria-label="${label||""}">${b}</svg>`;
+const GFIG={
+  uterus:()=>gSV(`<path class="tis" d="M22 84C22 44 66 36 112 44C142 50 158 64 188 72L236 78L236 94L188 100C158 108 142 120 112 126C66 134 22 124 22 84Z"/><path class="endo" d="M44 84Q104 70 160 84Q104 98 44 84Z"/><line class="canal" x1="160" y1="84" x2="236" y2="86"/>`
+    +gC(22,84,236,86,"L",140,78)+gC(92,41,92,129,"AP",98,36,"start")
+    +`<ellipse class="tis" cx="214" cy="140" rx="34" ry="20"/><ellipse class="endo" cx="214" cy="140" rx="13" ry="4"/>`+gC(180,140,248,140,"W",214,129)
+    +gT(12,16,"SAGITTAL","gk","start")+gT(214,114,"TRANSVERSE","gk")+gT(22,146,"Fundus","gs","start")+gT(238,68,"External os","gs","end"),"Uterus measured in sagittal and transverse planes"),
+  endo:()=>gSV(`<path class="tis" d="M8 80C8 40 58 30 108 40C128 44 140 58 140 80C140 102 128 116 108 120C58 130 8 120 8 80Z"/><path class="endo" d="M22 80C38 62 98 60 132 74L132 86C98 100 38 98 22 80Z"/>`
+    +gC(80,64,80,96,"ET",86,112,"start")+gT(74,146,"Thickest part, perpendicular,")+gT(74,157,"interface to interface (double layer)")
+    +`<path class="tis" d="M156 80C156 46 202 40 252 50L252 112C202 122 156 114 156 80Z"/><path class="endo" d="M166 68Q206 58 250 66L250 74Q206 66 166 76Z"/><path class="fluid" d="M166 76Q206 66 250 74L250 88Q206 96 166 86Z"/><path class="endo" d="M166 86Q206 96 250 88L250 96Q206 104 166 94Z"/>`
+    +gC(214,62.5,214,70,"a",220,60,"start")+gC(214,92,214,99.5,"b",220,110,"start")+gT(204,140,"Fluid in the cavity:")+gT(204,151,"ET = a + b, fluid excluded")+gT(10,16,"SAGITTAL","gk","start"),"Endometrial thickness"),
+  ovary:()=>gSV(`<ellipse class="ov" cx="98" cy="84" rx="78" ry="46"/>`+[[68,70,8],[106,60,6],[130,98,9],[80,106,7],[50,92,5],[124,70,5],[152,76,4]].map(([x,y,r])=>`<circle class="fol" cx="${x}" cy="${y}" r="${r}"/>`).join("")
+    +gC(20,84,176,84,"L",146,79)+gC(98,38,98,130,"H",104,142,"start")
+    +`<ellipse class="ov" cx="222" cy="84" rx="28" ry="38"/><circle class="fol" cx="214" cy="72" r="6"/><circle class="fol" cx="230" cy="100" r="5"/>`+gC(194,84,250,84,"W",222,79)
+    +gT(12,16,"SAGITTAL","gk","start")+gT(222,140,"TRANSVERSE","gk")+gT(130,162,"V = L × W × H × 0.523","gform"),"Ovarian volume"),
+  afc:()=>{ const f=[[48,70,6],[66,100,5],[86,56,7],[96,92,6],[120,116,5],[136,52,5],[160,104,7],[176,72,5],[70,124,4]];
+    return gSV(`<ellipse class="ov" cx="112" cy="86" rx="94" ry="54"/>`+f.map(([x,y,r],i)=>`<circle class="fol" cx="${x}" cy="${y}" r="${r}"/><text class="gn" x="${x}" y="${y+2.6}" text-anchor="middle">${i+1}</text>`).join("")
+      +`<circle class="fol" cx="128" cy="84" r="17"/><line class="lead" x1="140" y1="71" x2="200" y2="30"/>`+gT(252,24,"dominant ≥10 mm: not counted","gs","end")
+      +gT(112,160,"Count every 2–9 mm follicle, sweeping edge to edge")+gT(12,16,"EACH OVARY","gk","start"),"Antral follicle count"); },
+  lesion:()=>gSV(`<ellipse class="cap" cx="82" cy="86" rx="68" ry="52"/><ellipse class="fluid" cx="82" cy="86" rx="62" ry="46"/>`+gC(14,86,150,86,"D1",120,80)+gC(82,34,82,138,"D2",88,150,"start")
+    +`<ellipse class="cap" cx="212" cy="86" rx="42" ry="48"/><ellipse class="fluid" cx="212" cy="86" rx="36" ry="42"/>`+gC(170,86,254,86,"D3",212,80)
+    +gT(12,16,"SAGITTAL: D1 + D2","gk","start")+gT(212,16,"TRANSVERSE: D3","gk")+gT(130,164,"Capsule included · mm · where the lesion is largest"),"Adnexal lesion diameters"),
+  solid:()=>{ const P=(x0,body,h,l1,l2)=>`<rect class="fluidL" x="${x0}" y="30" width="80" height="80" rx="4"/><rect class="wall" x="${x0}" y="110" width="80" height="12"/>${body}${gT(x0+40,22,h,"gk")}${gT(x0+40,140,l1)}${gT(x0+40,152,l2)}`;
+    return gSV(P(4,`<path class="solid" d="M18 110C22 84 30 62 44 60C58 62 64 86 66 110Z"/>`+gC(74,110,74,60,"≥3",71,56,"end"),"PROJECTION","≥3 mm high","→ projection")
+      +P(90,`<path class="solid" d="M100 110Q130 96 160 110Z"/>`+gC(100,116,160,116,"",0,0)+`<text class="calt" x="130" y="92" text-anchor="middle">base ≥3</text>`,"SOLID, NOT PP","<3 high, base ≥3","→ solid comp.")
+      +P(176,`<path class="solid" d="M190 110q4-6 8 0zM206 110q3-5 6 0zM222 110q4-6 8 0zM238 110q3-4 6 0z"/>`,"IRREGULARITY","all <3 mm","→ irregular wall"),"Solid tissue definitions"); },
+  pp:()=>gSV(`<rect class="fluidL" x="6" y="24" width="146" height="94" rx="4"/><rect class="wall" x="6" y="118" width="146" height="12"/><path class="solid" d="M40 118C46 90 54 66 74 62C94 60 102 92 112 118Z"/>`
+    +gC(76,118,76,62,"height",82,52,"start")+gC(40,124,112,124,"",0,0)+gT(78,146,"base 1 · base 2 (90°)")+gT(150,112,"wall excl.","gs","end")
+    +`<rect class="fluidL" x="160" y="24" width="94" height="94" rx="4"/><line class="lead" x1="160" y1="118" x2="254" y2="118"/><path class="solid" d="M164 118C170 80 180 64 188 64C196 64 198 90 204 92C210 90 214 70 222 70C232 70 238 100 246 118Z"/>`
+    +gC(204,118,204,92,"x",199,108,"end")+gC(222,118,222,70,"y",228,98,"start")+gT(207,144,"x/y ≥50% → one")+gT(207,156,"x/y <50% → two")
+    +gT(10,16,"HEIGHT & BASE","gk","start")+gT(207,16,"COUNTING PEAKS","gk"),"Papillary projection measurement"),
+  loc:()=>gSV(`<ellipse class="cap" cx="80" cy="84" rx="68" ry="54"/><ellipse class="fluid" cx="80" cy="84" rx="62" ry="48"/><path class="sep" d="M78 36Q72 84 80 132M18 82Q80 74 142 86M80 78Q112 66 126 44"/>`
+    +[[46,62,1],[96,54,2],[124,72,3],[46,112,4],[110,112,5]].map(([x,y,n])=>`<text class="gn2" x="${x}" y="${y}" text-anchor="middle">${n}</text>`).join("")
+    +`<path class="cap" d="M168 66C168 46 252 46 252 66L252 104C252 124 168 124 168 104Z"/><path class="fluid" d="M173 67C173 52 247 52 247 67L247 103C247 119 173 119 173 103Z"/><path class="sep" d="M196 53L200 82M224 118L220 92"/>`
+    +gT(210,138,"Incomplete septa only")+gT(210,149,"→ unilocular")+gT(80,156,"Count locules in the whole volume")+gT(12,16,"MULTILOCULAR · 5 LOCULES","gk","start"),"Cyst locules"),
+  cs:()=>{ const C=[36,100,164,228], N=[0,2,6,13], L=[["1","none"],["2","minimal"],["3","moderate"],["4","abundant"]];
+    return gSV(C.map((cx,i)=>{ let v=""; for(let k=0;k<N[i];k++){ const a=k*2.4, r=4+((k*7)%15), x=cx+r*Math.cos(a)-3, y=74+r*Math.sin(a); v+=`<path class="flow" d="M${x.toFixed(1)} ${y.toFixed(1)}q3 -4 7 -1.5"/>`; }
+      return `<circle class="solid" cx="${cx}" cy="74" r="26"/>${v}${gT(cx,118,"CS "+L[i][0],"gs b")}${gT(cx,130,L[i][1])}`; }).join("")
+      +gT(130,156,"Score the most vascular part of the lesion (worst case)")+gT(10,16,"COLOR / POWER DOPPLER · PRF 0.3–0.6 kHz","gk","start"),"Color score 1 to 4"); },
+  shadow:()=>gSV(`<path class="beam" d="M70 24v9M66 29l4 5 4-5M196 24v9M192 29l4 5 4-5"/><circle class="solid" cx="70" cy="66" r="28"/><path class="shad" d="M54 88L40 146H48L58 90ZM64 93L58 146H66L68 94ZM74 93L80 146H88L78 92ZM84 89L100 146H108L88 87Z"/>`
+    +`<path class="enh" d="M174 84L174 146H218L218 84Z"/><path class="shadL" d="M166 68L163 146M226 68L229 146"/><circle class="cap" cx="196" cy="64" r="30"/><circle class="fluid" cx="196" cy="64" r="26"/>`
+    +gT(70,14,"TRUE ACOUSTIC SHADOW","gk")+gT(196,14,"EDGE SHADOW","gk")+gT(70,159,"Internal, fan-shaped: report")+gT(196,159,"At the edges: artifact, ignore"),"Acoustic shadow versus edge shadow"),
+  asc:()=>{ const pel=`<line class="lead" x1="8" y1="138" x2="124" y2="138"/><ellipse class="blad" cx="40" cy="112" rx="24" ry="18"/><ellipse class="tis" transform="rotate(38 74 78)" cx="74" cy="78" rx="30" ry="17"/><ellipse class="tis" transform="rotate(38 106 104)" cx="106" cy="104" rx="12" ry="8"/>`, pod=`<path class="fluid" d="M112 114Q128 114 124 132Q110 136 106 124Z"/>`;
+    return gSV(`<g>${pel}${pod}${gT(64,152,"PoD fluid only")}${gT(64,163,"→ not ascites")}${gT(8,16,"SAGITTAL · ANTERIOR ←","gk","start")}${gT(40,116,"Bladder","gs")}</g>`
+      +`<g transform="translate(132 0)">${pel}${pod}<path class="fluid" d="M30 40Q64 26 100 40Q86 48 62 44Q44 44 34 50Z"/><path class="fluid" d="M48 95Q58 86 66 92Q62 102 52 101Z"/>${gT(64,152,"Above fundus / vesico-uterine")}${gT(64,163,"(or Morison pouch) → ascites")}</g>`,"Ascites versus pouch of Douglas fluid"); },
+  fibroid:()=>gSV(`<rect class="tis" x="6" y="30" width="144" height="88"/><rect class="endo" x="6" y="118" width="144" height="10"/><rect class="cav" x="6" y="128" width="144" height="14"/><circle class="fib" cx="84" cy="72" r="28"/><path class="whorl" d="M70 64q14-10 28 0M68 76q16 10 32 0M76 70q8-5 16 0"/>`
+    +gC(84,100,84,118,"inner",90,112,"start")+gC(84,44,84,30,"outer",90,41,"start")+gT(8,24,"Serosa","gs","start")+gT(8,138,"Endometrium","gs","start")
+    +gT(78,155,"Inner: fibroid edge → endometrium")+gT(78,166,"Outer: fibroid edge → serosa")
+    +`<rect class="tis" x="162" y="30" width="94" height="66"/><rect class="endo" x="162" y="96" width="94" height="6"/><rect class="cav" x="162" y="102" width="94" height="38"/><circle class="fib" cx="208" cy="92" r="24"/><line class="lead dash" x1="162" y1="99" x2="256" y2="99"/>`
+    +gT(209,22,"FIGO: % INTRAMURAL","gk")+gT(209,153,"≥50% in wall → Type 2")+gT(209,164,"<50% in wall → Type 1"),"Fibroid myometrial margins and FIGO type"),
+};
+
+const GGRP={all:"All",ut:"Uterus",ov:"Ovary",ad:"Adnexal lesion",dop:"Doppler & fluid"};
+const GUIDE=[
+ {id:"uterus",grp:"ut",title:"Uterine size & volume",fig:"uterus",
+  proto:["Transvaginal mid-sagittal plane showing the endometrium and cervical canal.","<b>L</b>: fundal serosa → external os along the cavity line (add the body and cervix segments if the uterus is flexed).","<b>AP</b>: maximum diameter perpendicular to L, serosa to serosa, in the same plane.","<b>W</b>: maximum transverse diameter at the fundal/cornual level, after a 90° rotation.","Volume = L × W × AP × 0.523 (ellipsoid)."],
+  interp:[["n","Typical adult, nulliparous","About 7–8 × 4–5 × 3–4 cm; larger after pregnancies, smaller after menopause."],["n","Body : cervix ratio","About 2 : 1 in the reproductive years; about 1 : 1 before puberty and in postmenopausal atrophy."],["warn","Enlarged or irregular outline","Look for fibroids (FIGO / MUSA) or adenomyosis; report version and flexion."]],
+  src:"Standard textbook reference values; MUSA consensus (Van den Bosch, UOG 2015)."},
+ {id:"endometrium",grp:"ut",title:"Endometrial thickness",fig:"endo",
+  proto:["Mid-sagittal plane through the whole cavity; zoom so the uterus fills most of the image.","Measure the <b>thickest part</b>, perpendicular to the midline, from one myometrial–endometrial interface to the other (<b>double layer</b>).","Fluid in the cavity: measure each layer and add them (a + b); the fluid is excluded.","Describe echogenicity (three-layer, uniform, non-uniform) and the midline, using IETA terms."],
+  interp:[["ok","Postmenopausal bleeding, ET ≤4 mm","Endometrial cancer very unlikely; reassess if bleeding persists."],["warn","Postmenopausal bleeding, ET >4 mm or not seen","Further evaluation: sampling, saline sonography or hysteroscopy."],["n","Premenopausal","Changes with the cycle: thin after menses, about 5–10 mm and three-layered in the proliferative phase, thicker and echogenic in the secretory phase. Interpret with the cycle day."],["n","Asymptomatic postmenopausal","No universal cut-off; manage individually."]],
+  src:"IETA consensus (Leone, UOG 2010); ACOG Committee Opinion 734."},
+ {id:"fibroid",grp:"ut",title:"Fibroid size, margins & FIGO type",fig:"fibroid",
+  proto:["Three orthogonal diameters in two perpendicular planes; volume = d1 × d2 × d3 × 0.523.","<b>Inner myometrial margin</b>: shortest distance from the fibroid edge to the endometrium.","<b>Outer myometrial margin</b>: shortest distance from the fibroid edge to the serosa.","FIGO type: at the largest section, estimate how much lies in the wall versus the cavity or beyond the serosa.","MUSA features: echogenicity, edge or internal fan-shaped shadows, circumferential versus intralesional flow, margins."],
+  interp:[["warn","FIGO 0–2 (submucosal)","Linked to bleeding and subfertility; usually managed hysteroscopically."],["bad","Outer margin <5 mm with a FIGO 0–3 fibroid","Reduced safety margin for hysteroscopic resection (perforation risk)."],["warn","Inner margin <5 mm","Flagged by this reporter for surgical planning."],["n","Ill-defined margins or atypical features","Consider adenomyoma. Irregular cystic areas, high internal vascularity or rapid growth: specialist review or MRI."]],
+  src:"FIGO leiomyoma subclassification (Munro, PALM-COEIN 2011/2018); MUSA (Van den Bosch, UOG 2015)."},
+ {id:"ovary",grp:"ov",title:"Ovarian volume",fig:"ovary",
+  proto:["Find the longest axis in the sagittal plane: <b>L</b>; measure the perpendicular depth <b>H</b>.","Rotate 90° to the transverse plane and measure the maximum width <b>W</b>.","A lesion inside the ovary that can be told apart is measured separately; if it can't, measure ovary and lesion as one mass (IOTA 2026).","Volume = L × W × H × 0.523."],
+  interp:[["warn","Enlarged (this reporter's rule)","More than 20 mL premenopausal, or more than 10 mL postmenopausal."],["n","Polycystic ovarian morphology (2023 guideline)","Ovarian volume ≥10 mL in either ovary, used when the follicle count is not reliable."],["n","Postmenopausal ovary","Small with few or no follicles; an enlarged ovary needs an explanation."]],
+  src:"IOTA terms (Timmerman, UOG 2026); International PCOS Guideline 2023."},
+ {id:"afc",grp:"ov",title:"Antral follicle count",fig:"afc",
+  proto:["Transvaginal, ideally with a transducer of 8 MHz or more, early follicular phase (cycle day 2–5).","Sweep each ovary slowly from one edge to the other in one plane.","Count every follicle of 2–9 mm (mean diameter); report each ovary and the total.","Do not count a dominant follicle (≥10 mm) or cysts."],
+  interp:[["n","Polycystic ovarian morphology","20 or more follicles per ovary (8 MHz or higher transducer)."],["warn","Low count","A total below about 5–7 suggests reduced ovarian reserve; interpret with AMH and age."]],
+  src:"International PCOS Guideline 2023; ESHRE Bologna criteria."},
+ {id:"lesion",grp:"ad",title:"Adnexal lesion size",fig:"lesion",
+  proto:["Measure in mm where the lesion is largest, in two perpendicular planes.","Sagittal plane: length <b>D1</b> and the perpendicular AP diameter <b>D2</b>. Rotate 90°: transverse <b>D3</b>.","Include the cyst capsule when it is visible.","A lesion outside the ovary (e.g. hydrosalpinx) is measured separately from the ovary."],
+  interp:[["n","Largest diameter","Sets the thresholds: a premenopausal simple cyst ≤3 cm is a follicle (O-RADS 1); crossing 10 cm moves O-RADS 2→3 and 3→4, and the IOTA benign descriptors need <10 cm."],["n","ADNEX input","Maximum lesion diameter, in mm."],["n","Average linear dimension","(D1 + D2 + D3) / 3, used to track growth at follow-up (O-RADS v2022)."]],
+  src:"IOTA terms (Timmerman, UOG 2026;67:702–724); O-RADS US v2022."},
+ {id:"solid",grp:"ad",title:"Solid tissue: definitions",fig:"solid",
+  proto:["Solid component: tissue with solid echogenicity measuring <b>at least 3 mm in one diameter</b>.","Not solid: dermoid white ball, endometrioma sludge, blood clot (concave, no flow, moves on probe pressure), mucus, septa even when thick, incomplete septa, normal ovarian stroma.","Doppler flow confirms solid tissue, but no flow does not rule it out. If in doubt, call it solid.","Measure the largest solid component in three orthogonal diameters."],
+  interp:[["warn","Height ≥3 mm","Papillary projection."],["warn","Height <3 mm, base ≥3 mm","Solid component but not a projection: the lesion is unilocular-solid, so the IOTA benign descriptors no longer apply (use ADNEX)."],["n","Every diameter <3 mm","Wall irregularity only (ACR: unilocular cyst with an irregular wall = O-RADS 3)."],["bad","Solid tissue ≥80% of the lesion","Solid tumor; locules are not counted."]],
+  src:"IOTA terms (Timmerman, UOG 2026); O-RADS US v2022."},
+ {id:"pp",grp:"ad",title:"Papillary projections",fig:"pp",
+  proto:["Largest projection: <b>height</b> perpendicular to the wall and <b>base 1</b> in the sagittal plane; rotate 90° for <b>base 2</b>.","Don't include the wall or septum thickness in the height.","Counting merged peaks: from one baseline, measure the valley height x and the lower peak height y. If x/y ≥50% count one projection; if below 50%, count two.","Describe the surface (smooth or irregular) and blood flow (present or absent)."],
+  interp:[["bad","ACR: 1–3 projections","Unilocular or bilocular cyst = O-RADS 4."],["bad","ACR: 4 or more projections","O-RADS 5."],["n","ADNEX input","Number of projections: 0, 1, 2, 3 or ≥4."],["warn","Irregular surface or internal flow","Raises suspicion."]],
+  src:"IOTA terms (Timmerman, UOG 2026); O-RADS US v2022."},
+ {id:"loc",grp:"ad",title:"Cyst locules & septa",fig:"loc",
+  proto:["Septum: a thin strand running from wall to wall, or to another septum.","Count the locules through the whole lesion volume.","A cyst with only incomplete septa (e.g. hydrosalpinx) is unilocular.","In a solid tumor (≥80% solid) locules are not counted."],
+  interp:[["n","Lesion type","Unilocular, bilocular (ACR only) or multilocular, each with or without solid tissue."],["n","ADNEX input","More than 10 locules: yes or no (always no for a solid tumor)."],["warn","Variable contents","Locules with different echogenicity: describe them."]],
+  src:"IOTA terms (Timmerman, UOG 2026); O-RADS US v2022."},
+ {id:"cs",grp:"dop",title:"Color score",fig:"cs",
+  proto:["Examine the whole lesion (wall, septa and solid parts) with color or power Doppler.","PRF 0.3–0.6 kHz (3–6 cm/s); start with a high gain and lower it until artifacts disappear.","Don't use microvascular Doppler modes for the IOTA color score.","Score the most vascular area (worst case): 1 none · 2 minimal · 3 moderate · 4 abundant."],
+  interp:[["n","ACR: smooth multilocular cyst <10 cm","Color score 1–3 = O-RADS 3; color score 4 = O-RADS 4."],["bad","ACR: multilocular cyst with solid tissue","Color score 1–2 = O-RADS 4; 3–4 = O-RADS 5."],["warn","ACR: smooth solid lesion","Color score 1 = 3; 2–3 = 4; 4 = 5 (shadowing = 3)."]],
+  src:"IOTA terms (Timmerman, UOG 2026); O-RADS US v2022."},
+ {id:"shadow",grp:"dop",title:"Acoustic shadows",fig:"shadow",
+  proto:["A true shadow is loss of echoes behind a structure <b>inside</b> the lesion: fan-shaped in a fibroma, or behind a white ball or calcification.","Edge shadows at a rounded outer contour are artifacts and are not reported.","Gradual attenuation without a clearly defined loss of signal is not a shadow."],
+  interp:[["ok","Shadowing present","Favors a benign lesion: dermoid (IOTA BD2), fibroma, cystadenofibroma."],["ok","ACR","A smooth solid lesion with shadowing (color score 1–3) = O-RADS 3."],["n","ADNEX input","Acoustic shadows yes or no (presence lowers the estimated risk)."]],
+  src:"IOTA terms (Timmerman, UOG 2026); O-RADS US v2022."},
+ {id:"ascites",grp:"dop",title:"Ascites vs pelvic fluid",fig:"asc",
+  proto:["Ascites is fluid <b>outside the pouch of Douglas</b>: between bladder and uterus or above the fundus on transvaginal scan, or in Morison's pouch on transabdominal scan.","Fluid confined to the pouch of Douglas is no longer measured (IOTA 2026)."],
+  interp:[["n","Pouch of Douglas fluid only","Usually physiological; not ascites."],["bad","Ascites with an adnexal lesion","Raises the ACR category to O-RADS 5 (rule out non-tumor causes); also an ADNEX input."]],
+  src:"IOTA terms (Timmerman, UOG 2026); O-RADS US v2022."},
+];
+
+let gOne=null; // id of the single card being shown, or null for the filtered list
+function renderGuide(){
+  const f=S.ui.gf||"all";
+  $("gfilter").innerHTML=gOne?`<button class="gback" data-gall="1">← All measurements</button>`
+    :Object.entries(GGRP).map(([k,v])=>`<button data-gf="${k}" class="${k===f?"on":""}">${v}</button>`).join("");
+  $("gbody").classList.toggle("gone",!!gOne);
+  $("gbody").innerHTML=GUIDE.filter(g=>gOne?g.id===gOne:(f==="all"||g.grp===f)).map(g=>`<article class="gcard" id="g-${g.id}">
+    <h3>${g.title}</h3>
+    <div class="gfigw">${GFIG[g.fig]()}</div>
+    <div class="gcol"><h4>Definition &amp; how to measure</h4><ol>${g.proto.map(p=>`<li>${p}</li>`).join("")}</ol></div>
+    <div class="gcol"><h4>Interpretation</h4>${g.interp.map(([lv,k,t])=>`<div class="gi ${lv}"><b>${k}</b><span>${t}</span></div>`).join("")}<p class="gsrc">Source: ${g.src}</p></div>
+  </article>`).join("");
+}
+// openGuide("pp") shows that one card; openGuide(null,"ut") shows one group; openGuide() shows the list as last filtered.
+function openGuide(id,grp){
+  gOne=id||null;
+  if(grp) S.ui.gf=grp;
+  renderGuide();
+  const d=$("guide"); if(!d.open) d.showModal();
+  $("gbody").scrollTop=0;
+}
+// Small "?" next to each measurement field, opening only that measurement's card.
+const GTIP=[[/^ut\.l$/,"uterus"],[/^ut\.et$/,"endometrium"],[/^fib\.\d+\.(l|im|om)$/,"fibroid"],[/^fib\.\d+\.cs$/,"cs"],
+  [/^ov\.[RL]\.l$/,"ovary"],[/^ov\.[RL]\.fol$/,"afc"],[/^les\.\d+\.d1$/,"lesion"],[/^les\.\d+\.(solidTumor|flat|otherSolid|tiny|s1)$/,"solid"],
+  [/^les\.\d+\.(pp|ph)$/,"pp"],[/^les\.\d+\.loc$/,"loc"],[/^les\.\d+\.cs$/,"cs"],[/^les\.\d+\.shadow$/,"shadow"],[/^gl\.(ascites|pod)$/,"ascites"]];
+function tipify(){
+  document.querySelectorAll("main [data-p]").forEach(inp=>{
+    const hit=GTIP.find(([re])=>re.test(inp.dataset.p)); if(!hit) return;
+    const lab=inp.closest("label"), span=lab&&lab.querySelector(":scope>span"); if(!span||span.querySelector(".gq")) return;
+    const g=GUIDE.find(x=>x.id===hit[1]);
+    span.insertAdjacentHTML("beforeend",`<button type="button" class="gq" data-guide="${hit[1]}" title="How to measure: ${g.title}" aria-label="How to measure: ${g.title}">?</button>`);
+  });
+}
+const clearPG=()=>document.body.classList.remove("pg");
+
+/* ---------------- events ---------------- */
+document.addEventListener("input", onField);
+document.addEventListener("change", onField);
+function onField(e){
+  const p = e.target.dataset && e.target.dataset.p; if(!p) return;
+  setP(p, e.target.type==="checkbox" ? e.target.checked : e.target.value);
+  save(); update();
+}
+document.addEventListener("click", e=>{
+  const t=e.target;
+  const b=t.closest && t.closest("button");
+  if(b && b.dataset.guide){ e.preventDefault(); openGuide(b.dataset.guide); return; }
+  if(b && b.dataset.gg){ openGuide(null,b.dataset.gg); return; }
+  if(b && b.dataset.gall){ gOne=null; renderGuide(); $("gbody").scrollTop=0; return; }
+  if(b && b.dataset.gf){ S.ui.gf=b.dataset.gf; save(); renderGuide(); $("gbody").scrollTop=0; return; }
+  if(b && b.dataset.v){ S.ui.v=b.dataset.v; save(); refresh3D(); return; }
+  if(b && b.dataset.view && viewer){ viewer.setView(b.dataset.view==="cor"&&viewer.scene.ucor ? viewer.scene.ucor : VIEWS[b.dataset.view]); return; }
+  if(t.id==="addFib"){ S.fib.push(newFib()); save(); renderUt(); update(); }
+  else if(t.id==="addLes"){ S.les.push(newLes()); save(); renderLes(); update(); }
+  else if(t.dataset.delfib!=null){ S.fib.splice(+t.dataset.delfib,1); save(); renderUt(); update(); }
+  else if(t.dataset.delles!=null){ S.les.splice(+t.dataset.delles,1); save(); renderLes(); update(); }
+});
+$("btnNew").onclick = ()=>{ if(confirm("Clear all fields and start a new case?")){ const set=S.set; S=defaults(); S.set=set; save(); renderAll(); } };
+$("btnExample").onclick = ()=>{
+  const set=S.set; S=defaults(); S.set=set;
+  Object.assign(S.pt,{age:"34",meno:"pre",cycle:"D21",indication:"Pelvic pain",approach:"TVS"});
+  Object.assign(S.ut,{l:"8.2",w:"5.1",ap:"4.6",et:"9",etDesc:"homogeneous, secretory"});
+  S.fib=[Object.assign(newFib(),{loc:"posterior",l:"3.1",w:"2.8",h:"2.9",endo:"contact",cs:"2",im:"3",om:"6"})];
+  Object.assign(S.ov.R,{l:"4.5",w:"3.2",h:"3.0"}); Object.assign(S.ov.L,{l:"3.0",w:"2.0",h:"1.8",fol:"8"});
+  S.les=[Object.assign(newLes(),{side:"Right",d1:"38",d2:"34",d3:"32",contents:"ground-glass",classic:"endometrioma",cs:"1"})];
+  save(); renderAll(); toast("Example loaded");
+};
+$("btnCopy").onclick = async ()=>{
+  const txt=$("report").textContent;
+  try{ await navigator.clipboard.writeText(txt); toast("Report copied"); }
+  catch(e){ const ta=document.createElement("textarea"); ta.value=txt; document.body.appendChild(ta); ta.select(); try{document.execCommand("copy"); toast("Report copied");}catch(_){toast("Copy failed. Select the text manually.");} ta.remove(); }
+};
+$("btnPrint").onclick = ()=>{ clearPG(); window.print(); };
+$("btnGuide").onclick = ()=>openGuide();
+$("gclose").onclick = ()=>$("guide").close();
+$("guide").addEventListener("click",e=>{ if(e.target===$("guide")) $("guide").close(); });
+$("gprint").onclick = ()=>{
+  let pg=$("printGuide"); if(!pg){ pg=document.createElement("div"); pg.id="printGuide"; document.body.appendChild(pg); }
+  pg.innerHTML="<h1>Gynecologic ultrasound: measurement guide</h1>"+$("gbody").innerHTML;
+  $("guide").close(); document.body.classList.add("pg"); setTimeout(()=>window.print(),60);
+};
+window.addEventListener("afterprint",clearPG);
+document.addEventListener("mousedown",clearPG,true);
+$("btnTheme").onclick = ()=>{
+  const r=document.documentElement, cur=r.dataset.theme || (matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light");
+  r.dataset.theme = cur==="dark"?"light":"dark"; try{localStorage.setItem(LS+"-theme",r.dataset.theme)}catch(e){}
+  if(viewer) viewer.draw();
+};
+try{ const th=localStorage.getItem(LS+"-theme"); if(th) document.documentElement.dataset.theme=th; }catch(e){}
+/* ---------------- 3D pictogram engine (no dependencies) ---------------- */
+const G3 = (()=>{
+  const add=(a,b)=>[a[0]+b[0],a[1]+b[1],a[2]+b[2]], sub=(a,b)=>[a[0]-b[0],a[1]-b[1],a[2]-b[2]], mul=(a,s)=>[a[0]*s,a[1]*s,a[2]*s];
+  const dot=(a,b)=>a[0]*b[0]+a[1]*b[1]+a[2]*b[2], cross=(a,b)=>[a[1]*b[2]-a[2]*b[1],a[2]*b[0]-a[0]*b[2],a[0]*b[1]-a[1]*b[0]];
+  const len=a=>Math.hypot(a[0],a[1],a[2]), norm=a=>{const l=len(a)||1;return [a[0]/l,a[1]/l,a[2]/l];};
+  const hex=h=>[parseInt(h.slice(1,3),16),parseInt(h.slice(3,5),16),parseInt(h.slice(5,7),16)];
+  function basis(axis){ const y=norm(axis), t=Math.abs(y[1])<.9?[0,1,0]:[1,0,0], x=norm(cross(t,y)); return {x,y,z:cross(x,y)}; }
+  function rng(seed){ return ()=>{ seed=(seed+0x6D2B79F5)|0; let t=Math.imul(seed^seed>>>15,1|seed); t=(t+Math.imul(t^t>>>7,61|t))^t; return ((t^t>>>14)>>>0)/4294967296; }; }
+  function ellipsoid(c,r,o={}){
+    const nv=o.seg||14, nu=nv*2, V=[], T=[], B=o.axis?basis(o.axis):null;
+    for(let i=0;i<=nv;i++){ const v=i/nv*Math.PI; for(let j=0;j<nu;j++){ const u=j/nu*Math.PI*2;
+      const x=Math.sin(v)*Math.cos(u), y=Math.cos(v), z=Math.sin(v)*Math.sin(u), k=o.noise?o.noise(x,y,z):1;
+      const lx=r[0]*x*k, ly=r[1]*y*k, lz=r[2]*z*k;
+      let p = B ? add(add(mul(B.x,lx),mul(B.y,ly)),mul(B.z,lz)) : [lx,ly,lz];
+      p=add(p,c); if(o.xf) p=o.xf(p); V.push(p); } }
+    for(let i=0;i<nv;i++) for(let j=0;j<nu;j++){ const a=i*nu+j,b=i*nu+(j+1)%nu,cc=(i+1)*nu+j,d=(i+1)*nu+(j+1)%nu;
+      if(i>0) T.push([a,cc,b]); if(i<nv-1) T.push([b,cc,d]); }
+    return {V,T,col:o.col,a:o.a??1};
+  }
+  function cylinder(p1,p2,r,o={}){
+    const B=basis(sub(p2,p1)), n=12, V=[], T=[];
+    for(let i=0;i<n;i++){ const a=i/n*Math.PI*2, off=add(mul(B.x,Math.cos(a)*r),mul(B.z,Math.sin(a)*r)); V.push(add(p1,off),add(p2,off)); }
+    for(let i=0;i<n;i++){ const a=2*i,b=a+1,c=2*((i+1)%n),d=c+1; T.push([a,b,c],[b,d,c]); }
+    return {V,T,col:o.col,a:o.a??1};
+  }
+  function disc(c,axis,rr,o={}){
+    const B=basis(axis), n=30, V=[c], T=[], r1=Math.abs(dot(B.x,rr)), r2=Math.abs(dot(B.z,rr));
+    for(let i=0;i<n;i++){ const a=i/n*Math.PI*2; V.push(add(c,add(mul(B.x,Math.cos(a)*r1),mul(B.z,Math.sin(a)*r2)))); }
+    for(let i=0;i<n;i++) T.push([0,1+i,1+(i+1)%n]);
+    return {V,T,col:o.col,a:o.a??1};
+  }
+  const quad=(ps,o={})=>({V:ps,T:[[0,1,2],[0,2,3]],col:o.col,a:o.a??1});
+
+  class View{
+    constructor(cv){
+      this.cv=cv; this.ctx=cv.getContext("2d"); this.scene={meshes:[],lines:[],labels:[],extent:2};
+      this.yaw=-.5; this.pitch=.2; this.zoom=1; this.auto=false; this.key=null;
+      const pts=new Map(); let pd=null;
+      cv.addEventListener("pointerdown",e=>{ cv.setPointerCapture(e.pointerId); pts.set(e.pointerId,[e.clientX,e.clientY]); cv.style.cursor="grabbing"; });
+      cv.addEventListener("pointermove",e=>{
+        if(!pts.has(e.pointerId)) return; const p=pts.get(e.pointerId);
+        if(pts.size===1){ this.yaw+=(e.clientX-p[0])*.01; this.pitch=Math.max(-1.55,Math.min(1.55,this.pitch+(e.clientY-p[1])*.01)); }
+        pts.set(e.pointerId,[e.clientX,e.clientY]);
+        if(pts.size===2){ const [a,b]=[...pts.values()], d=Math.hypot(a[0]-b[0],a[1]-b[1]); if(pd) this.zoom=Math.max(.4,Math.min(4,this.zoom*d/pd)); pd=d; }
+        this.req();
+      });
+      const up=e=>{ pts.delete(e.pointerId); pd=null; if(!pts.size) cv.style.cursor="grab"; };
+      cv.addEventListener("pointerup",up); cv.addEventListener("pointercancel",up);
+      cv.addEventListener("wheel",e=>{ e.preventDefault(); this.zoom=Math.max(.4,Math.min(4,this.zoom*Math.exp(-e.deltaY*.0015))); this.req(); },{passive:false});
+      cv.addEventListener("dblclick",()=>this.reset());
+      if(window.ResizeObserver) new ResizeObserver(()=>this.req()).observe(cv);
+    }
+    req(){ if(this.rq) return; this.rq=requestAnimationFrame(()=>{ this.rq=0; this.draw(); }); }
+    setView(v){ this.yaw=v.yaw; this.pitch=v.pitch; this.draw(); }
+    setLabels(on){ this.labels=!!on; this.draw(); }
+    reset(){ const v=this.scene.view||{}; this.yaw=v.yaw??-.5; this.pitch=v.pitch??.2; this.zoom=1; this.draw(); }
+    set(scene,key){ this.scene=scene; if(key!==this.key){ this.key=key; this.reset(); } else this.draw(); }
+    setAuto(on){ this.auto=on; const loop=()=>{ if(!this.auto) return; this.yaw+=.007; this.draw(); requestAnimationFrame(loop); }; if(on) requestAnimationFrame(loop); }
+    draw(){
+      const cv=this.cv, dpr=window.devicePixelRatio||1, W=cv.clientWidth, H=cv.clientHeight; if(!W||!H) return;
+      if(cv.width!==Math.round(W*dpr)||cv.height!==Math.round(H*dpr)){ cv.width=Math.round(W*dpr); cv.height=Math.round(H*dpr); }
+      const ctx=this.ctx; ctx.setTransform(dpr,0,0,dpr,0,0); ctx.clearRect(0,0,W,H);
+      const s=this.scene, ext=s.extent||2, extW=s.extentW||ext, dist=Math.max(ext,extW)*3.4, F=Math.min(W/extW,H/ext)*.46*this.zoom*dist;
+      const cy=Math.cos(this.yaw), sy=Math.sin(this.yaw), cp=Math.cos(this.pitch), sp=Math.sin(this.pitch);
+      const tr=p=>{ const x=p[0]*cy+p[2]*sy, z0=-p[0]*sy+p[2]*cy; return [x,p[1]*cp-z0*sp,p[1]*sp+z0*cp]; };
+      const pr=q=>{ const k=F/(dist-q[2]); return [W/2+q[0]*k,H/2-q[1]*k]; };
+      const Ld=norm([-.35,.55,.76]), Hv=norm(add(Ld,[0,0,1])), L0=Ld[0],L1=Ld[1],L2=Ld[2],H0=Hv[0],H1=Hv[1],H2=Hv[2];
+      // pass 1: transform every vertex once into flat typed arrays, shade every triangle, collect one record per triangle
+      let nT=0; for(const m of s.meshes) nT+=m.T.length;
+      const nL=(s.lines||[]).length, cap=nT+nL;
+      if(!this.buf||this.buf.cap<cap) this.buf={cap,z:new Float64Array(cap),xy:new Float32Array(cap*6),f:new Array(cap),o:new Uint8Array(cap),ord:new Uint32Array(cap)};
+      const B=this.buf, Z=B.z, XY=B.xy, FS=B.f, OP=B.o, FC=this.fc||(this.fc=new Map()); let k=0;
+      for(const m of s.meshes){
+        const nv=m.V.length, TX=new Float64Array(nv*3), PX=new Float32Array(nv*2), rgb=m.rgb||(m.rgb=hex(m.col)), spec=(m.spec??.32)*255, va=m.va, vc=m.vc, ma=m.a;
+        for(let i=0;i<nv;i++){ const p=m.V[i], x=p[0]*cy+p[2]*sy, z0=-p[0]*sy+p[2]*cy, y=p[1]*cp-z0*sp, z=p[1]*sp+z0*cp, kk=F/(dist-z);
+          TX[3*i]=x; TX[3*i+1]=y; TX[3*i+2]=z; PX[2*i]=W/2+x*kk; PX[2*i+1]=H/2-y*kk; }
+        for(const t of m.T){
+          const i0=t[0],i1=t[1],i2=t[2], ax=TX[3*i0],ay=TX[3*i0+1],az=TX[3*i0+2];
+          const ux=TX[3*i1]-ax,uy=TX[3*i1+1]-ay,uz=TX[3*i1+2]-az, vx=TX[3*i2]-ax,vy=TX[3*i2+1]-ay,vz=TX[3*i2+2]-az;
+          let nx=uy*vz-uz*vy, ny=uz*vx-ux*vz, nz=ux*vy-uy*vx; const nl=Math.sqrt(nx*nx+ny*ny+nz*nz); if(nl<1e-10) continue;
+          nx/=nl; ny/=nl; nz/=nl; if(nz<0){ nx=-nx; ny=-ny; nz=-nz; }
+          const ba = va ? ma*(va[i0]+va[i1]+va[i2])/3 : ma; if(ba<.01) continue;
+          const df=Math.max(0,nx*L0+ny*L1+nz*L2), hs=Math.max(0,nx*H0+ny*H1+nz*H2), spv=hs>.5?Math.pow(hs,26)*spec:0, sh=.34+.66*df;
+          const op=ba>=.99, al=op?1:Math.min(1,ba*(.5+1.25*(1-nz)));
+          let r,g,b; if(vc){ const a0=vc[i0],a1=vc[i1],a2=vc[i2]; r=(a0[0]+a1[0]+a2[0])/3; g=(a0[1]+a1[1]+a2[1])/3; b=(a0[2]+a1[2]+a2[2])/3; } else { r=rgb[0]; g=rgb[1]; b=rgb[2]; }
+          r=Math.min(255,r*sh+spv)>>2; g=Math.min(255,g*sh+spv)>>2; b=Math.min(255,b*sh+spv)>>2; const aq=Math.round(al*80);
+          const key=((r*64+g)*64+b)*81+aq; let f=FC.get(key); if(!f){ f=`rgba(${r*4+2},${g*4+2},${b*4+2},${(aq/80).toFixed(3)})`; FC.set(key,f); }
+          Z[k]=az+TX[3*i1+2]+TX[3*i2+2]; const o6=6*k; XY[o6]=PX[2*i0]; XY[o6+1]=PX[2*i0+1]; XY[o6+2]=PX[2*i1]; XY[o6+3]=PX[2*i1+1]; XY[o6+4]=PX[2*i2]; XY[o6+5]=PX[2*i2+1];
+          FS[k]=f; OP[k]=op?1:0; k++;
+        }
+      }
+      const showL=this.labels!==false, lines=(s.lines||[]).filter(l=>showL||!l.lbl);
+      lines.forEach((l,i)=>{ const a=tr(l.a), b=tr(l.b), pa=pr(a), pb=pr(b), o6=6*k; Z[k]=1.5*(a[2]+b[2]); XY[o6]=pa[0]; XY[o6+1]=pa[1]; XY[o6+2]=pb[0]; XY[o6+3]=pb[1]; FS[k]=l; OP[k]=2; k++; });
+      // pass 2: painter's order (back to front) on an index array, then draw
+      const ord=B.ord.subarray(0,k); for(let i=0;i<k;i++) ord[i]=i; ord.sort((u,v)=>Z[u]-Z[v]);
+      ctx.lineJoin="round"; ctx.lineCap="round"; ctx.lineWidth=.6;
+      for(let q=0;q<k;q++){ const i=ord[q], o6=6*i;
+        if(OP[i]===2){ const l=FS[i]; ctx.strokeStyle=l.col; ctx.lineWidth=l.w||1.5; ctx.beginPath(); ctx.moveTo(XY[o6],XY[o6+1]); ctx.lineTo(XY[o6+2],XY[o6+3]); ctx.stroke(); ctx.lineWidth=.6; continue; }
+        ctx.fillStyle=FS[i]; ctx.beginPath(); ctx.moveTo(XY[o6],XY[o6+1]); ctx.lineTo(XY[o6+2],XY[o6+3]); ctx.lineTo(XY[o6+4],XY[o6+5]); ctx.closePath(); ctx.fill();
+        if(OP[i]){ ctx.strokeStyle=FS[i]; ctx.stroke(); }
+      }
+      if(FC.size>40000) FC.clear();
+      const css=getComputedStyle(document.documentElement), ink=css.getPropertyValue("--ink").trim(), card=css.getPropertyValue("--card").trim();
+      ctx.font="600 11px -apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif"; ctx.textBaseline="middle";
+      const placed=[], LBS=(this.labels===false?[]:s.labels||[]).map((lb,i)=>{ const txt=(W<520&&lb.short)?lb.short:lb.t, q=pr(tr(lb.p)); return {lb,txt,q,w:ctx.measureText(txt).width+(lb.col?20:12),pri:lb.col?0:1,i}; }).sort((a,b)=>a.pri-b.pri||a.i-b.i);
+      // keep labels clear of the overlay hint (top left) and the toolbar (bottom right)
+      const tb=this.cv.parentElement&&this.cv.parentElement.querySelector(".v3tools"), tw=tb?tb.offsetWidth+12:260;
+      placed.push({x:0,y:14,w:Math.min(W,330)},{x:W-tw,y:H-20,w:tw});
+      const hit=(x,y,w)=>placed.some(b=>x<b.x+b.w+4&&x+w+4>b.x&&Math.abs(y-b.y)<20);
+      for(const L of LBS){
+        // try nearby slots off the anchor (so the structure stays visible): above/below first, then sideways; keep inside the canvas
+        const d0=L.lb.nolead?[0]:[];
+        const find=(w,far)=>{ const dys=[...d0,-26,26,-47,47,-68,68,-89,89,-110,110,...(far?[-131,131,-152,152,-173,173]:[])], dxs=[0,-(w/2+14),w/2+14,-(w+20),w+20,...(far?[-(1.5*w+30),1.5*w+30]:[])];
+          for(const dx of dxs) for(const dy of dys){ const x=Math.max(4,Math.min(W-w-4,L.q[0]-w/2+dx)), y=Math.max(12,Math.min(H-12,L.q[1]+dy)); if(!hit(x,y,w)) return [x,y]; } return null; };
+        // full text near the structure → short form near it (explained in the footnote) → either form further away
+        let best=find(L.w,false);
+        if(!best&&L.lb.short&&L.txt!==L.lb.short){ const w2=ctx.measureText(L.lb.short).width+(L.lb.col?20:12), b2=find(w2,false); if(b2){ L.txt=L.lb.short; L.w=w2; best=b2; } }
+        if(!best) best=find(L.w,true);
+        if(!best&&L.lb.short){ const w2=ctx.measureText(L.lb.short).width+(L.lb.col?20:12), b2=find(w2,true); if(b2){ L.txt=L.lb.short; L.w=w2; best=b2; } }
+        if(!best) best=[Math.max(4,Math.min(W-L.w-4,L.q[0]-L.w/2)),Math.max(12,Math.min(H-12,L.q[1]+110))];
+        L.x=best[0]; L.y=best[1]; placed.push({x:L.x,y:L.y,w:L.w});
+      }
+      // leader lines: from the nearest point of each label box to its structure
+      const lead=css.getPropertyValue("--muted").trim()||"#888";
+      ctx.lineWidth=1; ctx.strokeStyle=lead; ctx.globalAlpha=.8;
+      for(const L of LBS){ if(L.lb.nolead) continue;
+        const ex=Math.max(L.x+4,Math.min(L.x+L.w-4,L.q[0])), ey=Math.max(L.y-9,Math.min(L.y+9,L.q[1]));
+        if(Math.hypot(ex-L.q[0],ey-L.q[1])<1) continue;
+        ctx.beginPath(); ctx.moveTo(L.q[0],L.q[1]); ctx.lineTo(ex,ey); ctx.stroke(); }
+      ctx.globalAlpha=1;
+      for(const L of LBS){
+        const lb=L.lb, txt=L.txt, w=L.w, x=L.x, y=L.y;
+        ctx.beginPath(); if(ctx.roundRect) ctx.roundRect(x,y-9,w,18,9); else ctx.rect(x,y-9,w,18);
+        ctx.globalAlpha=.9; ctx.fillStyle=card; ctx.fill(); ctx.globalAlpha=1;
+        ctx.strokeStyle=lb.col||"rgba(128,128,128,.45)"; ctx.lineWidth=1; ctx.stroke();
+        if(lb.col){ ctx.fillStyle=lb.col; ctx.beginPath(); ctx.arc(x+9,y,3.5,0,Math.PI*2); ctx.fill(); }
+        ctx.fillStyle=ink; ctx.fillText(txt,x+(lb.col?16:6),y+.5);
+      }
+      // anchor dots on the structures (drawn last so a label box never hides them)
+      for(const L of LBS){ if(L.lb.nolead) continue; ctx.beginPath(); ctx.arc(L.q[0],L.q[1],2.6,0,Math.PI*2); ctx.fillStyle=L.lb.col||lead; ctx.fill(); ctx.lineWidth=1; ctx.strokeStyle=card; ctx.stroke(); }
+      // report the label texts actually shown (for the abbreviation footnote)
+      const shown=LBS.map(L=>L.txt).join("\n"); this.shownTexts=LBS.map(L=>L.txt); if(shown!==this.shown){ this.shown=shown; this.onLabels&&this.onLabels(this.shownTexts); }
+      if(s.empty){ ctx.fillStyle=css.getPropertyValue("--muted").trim(); ctx.font="13px -apple-system,'Segoe UI',Roboto,sans-serif"; ctx.textAlign="center"; ctx.fillText(s.empty,W/2,H/2); ctx.textAlign="start"; }
+    }
+  }
+  return {add,sub,mul,dot,cross,norm,len,rng,basis,ellipsoid,cylinder,disc,quad,View};
+})();
+
+/* ---------------- 3D scenes ---------------- */
+const C3={myo:"#dd8a86",endo:"#f0c25a",stalk:"#b8646a",sub:"#d64545",im:"#e8892a",ss:"#7b5cc7",hyb:"#c2408f",ect:"#22998b",ovary:"#efcdb4",art:"#c8343c",ureter:"#eadfb8",tube:"#e39a96",lig:"#d9a39a",fluid:"#2b4a6b",bladder:"#f1d36e",follicle:"#2a3d55"};
+const FIBGRP={sub:"Submucosal (0–2)",im:"Intramural (3–4)",ss:"Subserosal (5–7)",hyb:"Hybrid (e.g. 2–5)",ect:"Other / ectopic (8)"};
+const fibGroup = code => code.includes("–") ? "hyb" : (+code<=2 ? "sub" : +code<=4 ? "im" : +code<=7 ? "ss" : "ect");
+
+/* ---- anatomical pelvis model, units = cm ---- */
+// [cervix angle, body flexion] in degrees from the vertical, + = anterior. The vagina runs up and back at about 45°,
+// so an anteverted cervix points up and forward and an anteflexed body lies almost horizontally on the bladder.
+const UTPOS={"anteverted":[40,25],"anteverted, anteflexed":[40,48],"retroverted":[-38,-12],"retroverted, retroflexed":[-38,-45],"axial":[-12,0]};
+const smooth=(a,b,x)=>{ const t=Math.min(1,Math.max(0,(x-a)/(b-a))); return t*t*(3-2*t); };
+function ringMesh(rings,M,o){
+  const V=[],T=[]; rings.forEach(r=>V.push(...r));
+  for(let i=0;i<rings.length-1;i++) for(let j=0;j<M;j++){ const a=i*M+j,b=i*M+(j+1)%M,c=(i+1)*M+j,d=(i+1)*M+(j+1)%M; T.push([a,c,b],[b,c,d]); }
+  return {V,T,col:o.col,a:o.a??1,spec:o.spec};
+}
+function sweepMesh(G,A,B,i0,i1,M,o){
+  const {add,mul}=G3, rings=[], pw=o.pw||1;
+  for(let i=i0;i<=i1;i++){ const ring=[]; for(let j=0;j<M;j++){ const u=j/M*Math.PI*2, sn=Math.sin(u); ring.push(add(G.C[i],add(mul(G.X,A[i]*Math.cos(u)),mul(G.Nn[i],B[i]*Math.sign(sn)*Math.pow(Math.abs(sn),pw))))); } rings.push(ring); }
+  return ringMesh(rings,M,o);
+}
+function tubeMesh(P,rf,M,o){
+  const {add,mul,sub,norm,cross}=G3, n=P.length, rings=[];
+  for(let i=0;i<n;i++){
+    const tg=norm(sub(P[Math.min(n-1,i+1)],P[Math.max(0,i-1)])), ax=Math.abs(tg[1])<.95?[0,1,0]:[1,0,0], x=norm(cross(ax,tg)), z=cross(tg,x), r=rf(i/(n-1)), ring=[];
+    for(let j=0;j<M;j++){ const u=j/M*Math.PI*2; ring.push(add(P[i],add(mul(x,r*Math.cos(u)),mul(z,r*Math.sin(u))))); }
+    rings.push(ring);
+  }
+  const m=ringMesh(rings,M,o);
+  if(o.fade){ m.va=[]; for(let i=0;i<n;i++){ const f=o.fade(i/(n-1)); for(let j=0;j<M;j++) m.va.push(f); } }
+  if(o.col2){ const c1=hex3(o.col), c0=hex3(o.col2); m.vc=[]; for(let i=0;i<n;i++){ const k=o.mix(i/(n-1)), c=[0,1,2].map(q=>c0[q]+(c1[q]-c0[q])*k); for(let j=0;j<M;j++) m.vc.push(c); } }
+  return m;
+}
+const hex3=h=>[1,3,5].map(i=>parseInt(h.slice(i,i+2),16));
+function catmull(ps,per){
+  const out=[];
+  for(let i=0;i<ps.length-1;i++){ const p0=ps[Math.max(0,i-1)],p1=ps[i],p2=ps[i+1],p3=ps[Math.min(ps.length-1,i+2)];
+    for(let k=0;k<per;k++){ const t=k/per,t2=t*t,t3=t2*t;
+      out.push([0,1,2].map(a=>.5*(2*p1[a]+(-p0[a]+p2[a])*t+(2*p0[a]-5*p1[a]+4*p2[a]-p3[a])*t2+(-p0[a]+3*p1[a]-3*p2[a]+p3[a])*t3))); } }
+  out.push(ps[ps.length-1]); return out;
+}
+function uterusGeom(ut){
+  const {add,mul,sub,dot}=G3, L=ut.L, W=ut.W, AP=ut.AP, [av,fl]=UTPOS[ut.pos]||UTPOS.anteverted, N=72, X=[1,0,0];
+  const C=[],Tg=[],Nn=[],A=[],B=[],AC=[],BC=[], et=Math.max(.1,Math.min(1.2,(ut.et||6)/20));
+  let p=[0,0,0];
+  for(let i=0;i<=N;i++){
+    const t=i/N, phi=(av+fl*smooth(.3,.55,t))*Math.PI/180, T=[0,Math.cos(phi),Math.sin(phi)];
+    if(i) p=add(p,mul(T,L/N)); C.push(p); Tg.push(T); Nn.push([0,-Math.sin(phi),Math.cos(phi)]);
+    // outer (serosal) contour: fusiform cervix, isthmus, broad body, domed fundus
+    let a = t<.36 ? W*(.23+.04*Math.sin(Math.PI*t/.36)) : W*(.25+.25*smooth(0,.62,(t-.36)/.64));
+    if(t>.8) a*=Math.sqrt(Math.max(0,1-((t-.8)/.2)**2));
+    if(t<.04) a*=Math.sqrt(t/.04);
+    A.push(a); B.push(a*(t<.36?.85:AP/W));
+    // cervical canal + triangular endometrial cavity
+    let ac=0,bc=0;
+    if(t>=.02 && t<.38){ ac=.14; bc=.09; }
+    else if(t>=.38 && t<=.86){ ac=W*(.04+.23*smooth(.38,.82,t)); bc=et*(.4+.6*smooth(.38,.62,t))*(1-.35*smooth(.74,.84,t)); if(t>.815){ const k=Math.sqrt(Math.max(0,1-((t-.815)/.045)**2)); ac*=.35+.65*Math.pow(k,.35); bc*=k; } }
+    AC.push(Math.min(ac,a*.8)); BC.push(Math.min(bc,B[i]*.7));
+  }
+  const ctr=C[Math.round(N*.62)]; for(let i=0;i<=N;i++) C[i]=sub(C[i],ctr);
+  const near=q=>{ let bi=0,bd=1e9; for(let i=0;i<=N;i++){ const d=sub(q,C[i]), dd=dot(d,d); if(dd<bd){ bd=dd; bi=i; } } const d=sub(q,C[bi]); return {i:bi,x:dot(d,X),n:dot(d,Nn[bi]),s:dot(d,Tg[bi])}; };
+  const inS=q=>{ const k=near(q); if((k.i===0&&k.s<0)||(k.i===N&&k.s>0)) return false; return A[k.i]>0 && (k.x/A[k.i])**2+(k.n/B[k.i])**2<=1; };
+  const cavI0=Math.round(.38*N), cavI1=Math.round(.86*N);
+  const inC=q=>{ const k=near(q); if(k.i<cavI0||k.i>cavI1) return false; return AC[k.i]>0 && (k.x/AC[k.i])**2+(k.n/BC[k.i])**2<=1; };
+  return {N,C,Tg,Nn,A,B,AC,BC,X,inS,inC,cavI0,cavI1,at:t=>Math.round(t*N),bodyDeg:av+fl};
+}
+const rayExit=(o,d,inF,max=14)=>{ let s=0; while(s<max && inF(G3.add(o,G3.mul(d,s)))) s+=.03; return s; };
+// location → [position along uterine axis (0 = external os, 1 = fundus), direction in local frame [lateral, axial, anterior]]
+const FLOC={anterior:[.66,[0,0,1]],posterior:[.66,[0,0,-1]],fundal:[.8,[0,1,0]],"right lateral":[.66,[-1,0,0]],"left lateral":[.66,[1,0,0]],"right cornual":[.84,[-1,.7,0]],"left cornual":[.84,[1,.7,0]],isthmic:[.42,[0,0,1]],cervical:[.18,[0,0,1]]};
+function placeFib(U,f,n){
+  const {add,mul,norm}=G3, X=U.X, jt=[0,.06,-.06,.11,-.11][n%5], jr=[0,.35,-.35,.6,-.6][n%5];
+  let [tb,ld]=FLOC[f.loc]||FLOC.anterior; if(f.tb!=null) tb=f.tb;
+  tb=Math.min(.88,Math.max(.1,tb+jt));
+  const i=U.at(tb), T=U.Tg[i], Nv=U.Nn[i], o=U.C[i];
+  let dl=[ld[0]+jr*ld[2], ld[1], ld[2]-jr*ld[0]]; if(!ld[0]&&!ld[2]) dl=[jr,1,0];
+  const d=norm(add(add(mul(X,dl[0]),mul(T,dl[1])),mul(Nv,dl[2])));
+  let r=f.r, depth, stalk=null, bulge=true;
+  if(f.code==="8"){
+    const s=/left/.test(f.loc)?1:-1, k=U.at(.45), kc=U.at(.2);
+    let c;
+    if(f.ect==="broad ligament"){ c=add(U.C[k],mul(X,s*(U.A[k]+r+.6))); bulge=false; }
+    else if(f.ect==="parasitic"){ const k3=U.at(.3); c=add(add(U.C[k3],mul(U.Nn[k3],-(U.B[k3]+r+1.5))),[s*1.5,-.5,0]); bulge=false; }
+    else { const rs2=rayExit(U.C[kc],U.Nn[kc],U.inS); c=add(U.C[kc],mul(U.Nn[kc],Math.max(.25,rs2-r*.55))); }
+    return {c,r,stalk,bulge,cav:false};
+  }
+  const rc=U.inC(o)?rayExit(o,d,U.inC):0, rs=rayExit(o,d,U.inS), wall=rs-rc;
+  if(f.code.includes("–")){ r=Math.max(r,wall/2+.15); depth=(rc+rs)/2; }
+  else depth=({"0":rc-r-.4,"1":rc-.25*r,"2":rc+.3*r,"3":rc+r+.05,"4":Math.max(rc+r+.15,(rc+rs)/2),"5":rs-.3*r,"6":rs+.3*r,"7":rs+r+.7})[f.code];
+  const c=add(o,mul(d,depth));
+  if(f.code==="0"){ stalk=[add(o,mul(d,rc)),add(c,mul(d,r*.8))]; bulge=false; }
+  if(f.code==="7"){ stalk=[add(o,mul(d,rs-.1)),add(c,mul(d,-r*.8))]; bulge=false; }
+  return {c,r,stalk,bulge,cav:f.code!=="7"};
+}
+function pushOut(m,c,rr){ for(let k=0;k<m.V.length;k++){ const d=G3.sub(m.V[k],c), l=G3.len(d); if(l<rr&&l>1e-6) m.V[k]=G3.add(c,G3.mul(d,rr/l)); } }
+function enclose(a,b){ const {add,sub,mul,len}=G3, d=len(sub(b.c,a.c)); if(d+b.R<=a.R) return a; if(d+a.R<=b.R) return b; const R=(d+a.R+b.R)/2; return {c:add(a.c,mul(sub(b.c,a.c),(R-a.R)/(d||1))),R}; }
+
+function pelvisScene(cfg){
+  const nf=m=>(m.nofit=true,m);
+  const {add,sub,mul,norm,ellipsoid,cylinder}=G3, rnd=G3.rng(11);
+  const U=uterusGeom(cfg.ut), N=U.N, X=U.X, meshes=[], lines=[], labels=[];
+  const serosa=sweepMesh(U,U.A,U.B,0,N,40,{col:C3.myo,a:.24,spec:.25});
+  const cav=sweepMesh(U,U.AC,U.BC,1,U.cavI1,28,{col:C3.endo,a:.42,spec:.4,pw:1.5});
+  /* fibroids: placed by FIGO type, myometrium/serosa bulge over them, cavity deforms around them */
+  const seen={}, placed=[];
+  cfg.fibs.forEach(f=>{ const n=seen[f.loc]=(seen[f.loc]??-1)+1, pl=placeFib(U,f,n); placed.push({f,...pl});
+    if(pl.bulge) pushOut(serosa,pl.c,pl.r+.3);
+    if(pl.cav && f.code!=="8") pushOut(cav,pl.c,pl.r+.06); });
+  meshes.push(serosa,cav);
+  placed.forEach(p=>{ const col=C3[fibGroup(p.f.code)];
+    meshes.push(ellipsoid(p.c,[p.r,p.r*.95,p.r*.97],{seg:14,col,a:.96,spec:.35,noise:(x,y,z)=>1+.035*Math.sin(6*x+2*y)*Math.cos(5*z+1)}));
+    if(p.stalk) meshes.push(cylinder(p.stalk[0],p.stalk[1],Math.max(.12,p.r*.22),{col:C3.stalk})); });
+  const maxA=Math.max(...U.A);
+  if(cfg.refLabels){
+    for(const sd of [-1,1]){
+      const grp=placed.filter(p=>{ const x=p.c[0]; const sdP = x<-.3?-1 : x>.3?1 : (["0","4","8"].includes(p.f.code)?1:-1); return sdP===sd; }).sort((a,b)=>b.c[1]-a.c[1]);
+      let y=Infinity;
+      grp.forEach(p=>{ y=Math.min(p.c[1],y-1.05); const lab=[sd*(maxA+3.6),y,0]; lines.push({a:p.c,b:lab,col:"rgba(128,128,128,.7)",w:1,lbl:true}); labels.push({p:lab,t:p.f.label,short:p.f.short,col:C3[fibGroup(p.f.code)]}); });
+    }
+  } else placed.forEach(p=>labels.push({p:add(p.c,[0,p.r+.55,0]),t:p.f.label,short:p.f.short,col:C3[fibGroup(p.f.code)]}));
+  labels.push({p:add(U.C[N],mul(U.Tg[N],.9)),t:`Uterus · ${cfg.ut.pos}`,short:"Uterus"});
+  labels.push({p:add(U.C[0],mul(U.Tg[0],-.8)),t:"Cervix",short:"Cx"});
+
+  /* adnexa: ovaries in the ovarian fossae, tubes arching over them, lesions by origin */
+  const kIs=U.at(.36), Pis=U.C[kIs], adn={};   // isthmus: fixed pelvic reference (supported by the cardinal and uterosacral ligaments)
+  if(cfg.adnexa){
+    for(const [key,s] of [["R",-1],["L",1]]){
+      const o=cfg.ov[key], r=[o.dims[1]/2,o.dims[0]/2,o.dims[2]/2], ovR=Math.max(...r);
+      // ovarian fossa on the side wall, but tethered by the utero-ovarian ligament (~3–4 cm): an anteverted uterus pulls the ovary forward
+      let oc=add(Pis,[s*Math.max(maxA+1.7,4.1),1.7,-1.5]);
+      { const k=U.at(.74), dU=norm(add(add(mul(X,s),mul(U.Nn[k],-.5)),mul(U.Tg[k],-.15))), uo=add(U.C[k],mul(dU,rayExit(U.C[k],dU,U.inS))), d=sub(oc,uo), Ld=G3.len(d), cap=3.3+r[1]*.6;
+        if(Ld>cap) oc=add(uo,mul(d,cap/Ld)); }
+      adn[key]={s,o,oc,ovc:oc,r,ovR,bound:{c:oc,R:ovR},swell:0,n:0};
+    }
+    const lesPlaced=[]; let midStack=0;
+    cfg.les.forEach(({L,calc,idx})=>{
+      const key=L.side==="Left"?"L":L.side==="Right"?"R":"M", Rr=(calc.maxmm||40)/20;
+      if(key==="M"){ const k=U.at(.3), c=add(U.C[k],[0,-.4,-(U.B[k]+Rr+.5+midStack)]); midStack+=2*Rr+.3; lesPlaced.push({L,calc,idx,c,Rr}); return; }
+      const A=adn[key], s=A.s;
+      if(L.classic==="hydrosalpinx"){ const dd=[num(L.d1),num(L.d2),num(L.d3)].filter(Boolean); A.swell=Math.max(A.swell,Math.min(2.5,(dd.length?Math.min(...dd):20)/20)); lesPlaced.push({L,calc,idx,hydro:key}); return; }
+      let c;
+      if(A.n>0) c=add(A.bound.c,[s*.3,A.bound.R+Rr+.2,.2]);
+      else if(L.origin==="ovarian"){
+        if(Rr>A.ovR*.8){ c=add(A.oc,[s*Rr*.35,Rr*.45,.2]); A.ovc=add(c,mul(norm([-s*.6,-.8,-.15]),Rr*.88)); A.bound={c,R:Rr}; } // ovarian tissue as a crescent at one pole
+        else c=add(A.oc,[s*A.ovR*.18,A.ovR*.12,.15]);
+      }
+      else if(L.origin==="paraovarian") c=add(A.oc,[s*.3,A.ovR+Rr+.4,.3]);
+      else if(L.origin==="tubal") c=add(A.oc,[s*(A.ovR+Rr*.6),A.ovR*.6+Rr*.5,-.6]);
+      else c=add(A.oc,[0,-(A.ovR+Rr+.3),-.8]);
+      A.n++; A.bound=enclose(A.bound,{c,R:Rr});
+      lesPlaced.push({L,calc,idx,c,Rr});
+    });
+    for(const key of ["R","L"]){
+      const A=adn[key], s=A.s, o=A.o, side=key==="R"?"Right":"Left";
+      A.bound=enclose(A.bound,{c:A.ovc,R:A.ovR});
+      const axis=norm([s*.35,1,-.3]);
+      if(o.vis==="visualized"){
+        meshes.push(ellipsoid(A.ovc,A.r,{axis,seg:16,col:C3.ovary,a:.5,spec:.2,noise:(x,y,z)=>1+.04*Math.sin(7*x+3*z)*Math.sin(5*y)}));
+        const Bs=G3.basis(axis), fr=Math.min(...A.r)*.42;
+        for(let i=0;i<Math.min(25,o.fol);i++){
+          const d=norm([rnd()-.5,rnd()-.5,rnd()-.5]), q=add(A.ovc,add(add(mul(Bs.x,d[0]*A.r[0]*.62),mul(Bs.y,d[1]*A.r[1]*.62)),mul(Bs.z,d[2]*A.r[2]*.62))), rr=fr*(.55+.45*rnd());
+          meshes.push(ellipsoid(q,[rr,rr,rr],{seg:7,col:C3.follicle,a:.75,spec:.5}));
+        }
+        labels.push({p:add(A.ovc,[0,-(A.ovR+.8),0]),t:o.label,short:key+" ov",col:o.col});
+      } else labels.push({p:A.oc,t:`${side} ovary ${o.vis}`,short:key+" ov –"});
+      // ---- fallopian tube, rooted in the cornu: interstitial part inside the myometrium, cuff at the serosa,
+      //      isthmus → ampulla arching over the adnexa → infundibulum opening onto the ovary
+      const Bo=G3.basis(axis), ovExt=d=>1/Math.sqrt((G3.dot(d,Bo.x)/A.r[0])**2+(G3.dot(d,Bo.y)/A.r[1])**2+(G3.dot(d,Bo.z)/A.r[2])**2);
+      const inOv=q=>{ const d=sub(q,A.ovc); return (G3.dot(d,Bo.x)/A.r[0])**2+(G3.dot(d,Bo.y)/A.r[1])**2+(G3.dot(d,Bo.z)/A.r[2])**2<=1; };
+      const ovExit=(p,d)=>{ let t=0; while(t<8&&inOv(add(p,mul(d,t)))) t+=.03; return add(p,mul(d,t)); };
+      const upPole=add(A.ovc,mul(axis,A.r[1]*.5)), loPole=add(A.ovc,mul(axis,-A.r[1]*.55));   // tubal (upper) and uterine (lower) poles
+      // infundibulopelvic ligament: from the tubal pole up and laterally, over the external iliac vessels at the pelvic brim, then up along psoas
+      const ipS=ovExit(upPole,norm(add(axis,mul(X,s*.5))));
+      const IPP=[upPole,add(ipS,mul(norm([s*.5,.8,-.2]),.45)),add(Pis,[s*4.95,4.2,-3.1]),add(Pis,[s*4.75,5.55,-3.15]),add(Pis,[s*4.2,7.6,-3.8])];
+      // endometrial (cornual) angle → interstitial (intramural) tube → serosal exit
+      const kc=U.at(.82), kA=U.at(.825), Ang=add(U.C[kA],mul(X,s*U.AC[kA]*.9));                     // lateral tip of the cavity
+      const dC=norm(add(mul(X,s),mul(U.Tg[kc],.22))), Psf=add(U.C[kc],mul(dC,rayExit(U.C[kc],dC,U.inS)));
+      const Pmid=add(mul(add(Ang,Psf),.5),mul(U.Tg[kc],.12)), b=A.bound, Rb=b.R, sw=A.swell;
+      const toOv=norm([s*.45,-.15,-1]), mouth=add(b.c,mul(toOv,Rb+.55));       // infundibulum lies posterolateral, mouth facing the ovary
+      // tube length is ~10–12 cm: use the full arch over the adnexa, or a flatter one when the cornu lies far from the ovary
+      const pLen=Q=>{ let L=0; for(let i=1;i<Q.length;i++) L+=G3.len(sub(Q[i],Q[i-1])); return L; };
+      const head=[add(Ang,mul(X,-s*.7)),add(Ang,mul(X,-s*.32)),Ang,Pmid,Psf];
+      let P=null, best=1e9; const hL=pLen(catmull(head,8));
+      for(const k of [2.2,1.7,1.3,1,.6,.25,0]){   // pick the arch whose extrauterine length is closest to ~10 cm
+        const mid=k? [add(Psf,mul(dC,.9)),add(b.c,[-s*Rb*.35*k,Rb*(.6+.4*k)+.45*k,-.1]),add(b.c,[s*(Rb+.45*k),Rb*.3,-.5])] : [add(Psf,mul(dC,.9)),add(mul(add(Psf,b.c),.5),[0,Rb*.5,0])];
+        const Q=catmull([...head,...mid,add(mouth,mul(toOv,.6)),mouth],8), e=Math.abs(pLen(Q)-hL-10); if(e<best){ best=e; P=Q; }
+      }
+      const idx=q=>{ let k=0; P.forEach((r,i)=>{ if(G3.len(sub(r,q))<G3.len(sub(P[k],q))) k=i; }); return k/(P.length-1); };
+      const tA=idx(Ang), tS=idx(Psf), bc=Math.max(.1,Math.min(.2,U.BC[kA]*.8));
+      // funnel from the endometrial angle (endometrial thickness) down to the narrow intramural lumen, small cuff where it leaves the serosa
+      const tubeR=t=>.09+(bc-.09)*(1-smooth(tA*.85,tA+(tS-tA)*.6,t))+.05*smooth(tA,tS,t)+.12*Math.exp(-(((t-tS)/.05)**2))+.2*smooth(tS+.1,.75,t)+sw*smooth(.35,.6,t)*(1-smooth(.86,.98,t));
+      meshes.push(tubeMesh(P,tubeR,14,{col:C3.tube,a:.93,spec:.3,col2:C3.endo,mix:t=>smooth(tA*.4,tS+.05,t),fade:t=>.45*smooth(0,tA*.9,t)+.55*smooth(tA,tS+.04,t)}));
+      if(key==="R") labels.push({p:add(Ang,[0,.55,0]),t:"Endometrial angle → interstitial tube",short:"Cornu"});
+      const ax=norm(sub(P[P.length-1],P[P.length-2])), Bf=G3.basis(ax);
+      if(sw){ // hydrosalpinx: occluded, club-shaped distal end, no fimbriae
+        meshes.push(ellipsoid(mouth,[tubeR(1),tubeR(1)*1.15,tubeR(1)],{axis:ax,seg:12,col:C3.tube,a:.93,spec:.3}));
+      } else {
+        const fun=Array.from({length:8},(_,k)=>add(mouth,mul(ax,.7*k/7))), rim=fun[7];
+        meshes.push(tubeMesh(fun,u=>.36+.5*Math.pow(u,1.7),16,{col:C3.tube,a:.9,spec:.3}));                 // trumpet-shaped infundibulum
+        for(let ring=0;ring<2;ring++){                                                                    // fimbriae: soft, tapered fronds in two rings, curling back over the rim
+          const nR=ring?11:16;
+          for(let k=0;k<nR;k++){
+            const th=(k+(ring?.5:0))/nR*Math.PI*2+(rnd()-.5)*.35, rad=add(mul(Bf.x,Math.cos(th)),mul(Bf.z,Math.sin(th)));
+            const L0=(ring?.28:.42)+.32*rnd(), curl=(ring?.35:.55)+.4*rnd(), sway=mul(add(mul(Bf.x,-Math.sin(th)),mul(Bf.z,Math.cos(th))),(rnd()-.5)*.35);
+            const base=add(rim,mul(rad,ring?.55:.8));
+            const pts=[add(base,mul(ax,-.15)),add(base,add(mul(ax,L0*.5),mul(rad,.08))),add(base,add(add(mul(ax,L0*.85),mul(rad,curl*.45)),sway)),add(base,add(add(mul(ax,L0*.7),mul(rad,curl*.9)),mul(sway,1.6)))];
+            meshes.push(tubeMesh(catmull(pts,3),u=>(ring?.075:.11)*(1-.75*u)+.015,6,{col:(k+ring)%3?"#e2918a":"#d97f79",a:.97,spec:.4}));
+          }
+        }
+        if(o.vis!=="absent"){                                                                               // fimbria ovarica reaching the ovary
+          const dO=norm(sub(rim,A.ovc)), tgt=add(A.ovc,mul(dO,ovExt(dO)*.82)), f0=add(rim,mul(norm(sub(tgt,rim)),.5));
+          meshes.push(tubeMesh(catmull([add(rim,mul(ax,-.1)),f0,add(mul(add(f0,tgt),.5),mul(dO,.25)),tgt],5),u=>.1+.06*smooth(.8,1,u),7,{col:"#d47a75",a:.95,spec:.3}));
+        }
+      }
+      labels.push({p:add(P[Math.round(P.length*.42)],[0,.75,0]),t:`${side} tube${sw?" · hydrosalpinx":""}`,short:key+" tube"});
+      labels.push({p:[s*(Math.abs(A.oc[0])+Rb+2.4),A.oc[1]+1.6,0],t:`Patient ${key}`,short:key,nolead:true});
+      // ---- arterial supply (shown with the ligament layer, and in full with the "Arterial supply" layer)
+      if(cfg.ctx||cfg.art){
+        // uterine artery: from the internal iliac on the side wall, medially in the base of the broad ligament (cardinal
+        // ligament), over the ureter about 2 cm lateral to the cervix, reaching the uterus at the internal os; then it climbs
+        // tortuously along the lateral wall to the cornu and runs under the tube to anastomose with the ovarian artery.
+        const wallPt=(t,o=0)=>{ const k=U.at(t); return add(add(U.C[k],mul(X,s*(U.A[k]+.14))),mul(U.Nn[k],o)); };
+        const hil=A.ovc, toUt=norm(sub(wallPt(.8),hil)), hilP=add(hil,mul(toUt,ovExt(toUt)*.95));
+        const ua=[add(Pis,[s*5.1,1.05,-3.9]),add(Pis,[s*4.6,.75,-2.6]),add(Pis,[s*3.6,.2,-1.1]),add(Pis,[s*2.2,-.05,-.15]),wallPt(.36)];
+        [.43,.5,.57,.64,.71,.78].forEach((t,i)=>ua.push(wallPt(t,(i%2?.24:-.24))));
+        ua.push(wallPt(.83,-.1),add(mul(add(wallPt(.83),hilP),.5),[0,-.35,-.3]),hilP);
+        meshes.push(tubeMesh(catmull(ua,5),t=>.1-.04*smooth(.55,1,t),8,{col:C3.art,a:.95,spec:.45,fade:t=>.25+.75*smooth(0,.12,t)}));
+        // ovarian artery inside the infundibulopelvic ligament, entering the hilum
+        if(o.vis!=="absent"){
+          meshes.push(nf(tubeMesh(catmull([hilP,...IPP.slice(1),...(cfg.art?[add(Pis,[s*2.8,9.8,-4.6]),add(Pis,[s*1,11.2,-5])]:[])],6),t=>.07,7,{col:C3.art,a:.95,spec:.45,fade:t=>1-smooth(cfg.art?.7:.5,1,t)}))); }
+        if(s===1) labels.push({p:wallPt(.57,.5),t:"Uterine artery (ascending)",short:"Ut a."});
+        if(cfg.art&&s===1) labels.push({p:hilP,t:"Ovarian a. ↔ uterine a. anastomosis",short:"Anast."});
+        // external iliac artery along the pelvic brim to the mid-inguinal point (continuing as the femoral a. under the inguinal
+        // ligament), and the inferior epigastric artery rising medial to the deep inguinal ring: landmarks for the round ligament
+        { const pq=(x,y,z)=>add(Pis,[s*x,y,z]);
+          const eia=nf(tubeMesh(catmull([pq(3.75,5.3,-4.75),pq(4.6,4.6,-3.6),pq(5.3,3.6,-.8),pq(5.6,2,3),pq(5.55,.9,5.4),pq(5.5,.4,6.2),pq(5.5,-1.3,6.6)],6),()=>.36,10,{col:C3.art,a:.95,spec:.45,fade:t=>(cfg.art?1:.35+.65*smooth(0,.3,t))*(1-smooth(.82,1,t))})); eia.tag="eia-"+key; meshes.push(eia);
+          const iea=nf(tubeMesh(catmull([pq(5.55,.75,5.6),pq(5.4,1.6,6.35),pq(4.6,3.5,6.7),pq(3.2,6.5,6.9)],5),()=>.1,7,{col:C3.art,a:.95,spec:.45,fade:t=>1-smooth(.5,1,t)})); iea.tag="iea-"+key; meshes.push(iea);
+          if(s===1){ labels.push({p:pq(5.6,2,3),t:"External iliac a.",short:"EIA"}); labels.push({p:pq(4.6,3.5,6.7),t:"Inferior epigastric a.",short:"IEA"}); } }
+        if(cfg.art){
+          const AR=C3.art, ah=(pts,r,per=5,seg=7,o={})=>{ const m=Object.assign(tubeMesh(catmull(pts,per),typeof r==="function"?r:()=>r,seg,{col:AR,a:.95,spec:.45,...o}),o.nofit?{nofit:true}:{}); meshes.push(m); return m; };
+          // iliac system: aorta (bifurcates ~L4) → common iliac → internal iliac, which divides at the upper border of the
+          // greater sciatic foramen into a posterior division (iliolumbar, lateral sacral, superior gluteal) and an anterior
+          // division (umbilical → superior vesical, obturator, UTERINE, vaginal, middle rectal, internal pudendal, inferior gluteal)
+          const pp=(x,y,z)=>add(Pis,[s*x,y,z]), nfo={nofit:true}, far=t=>1-smooth(.45,1,t);
+          const AB=add(Pis,[0,8.6,-5.6]), Bf=pp(3.75,5.3,-4.75), IId=pp(4.6,3,-5), PD=pp(4.55,3.1,-5.6), AO=ua[0];
+          if(s===1) ah([AB,add(Pis,[0,10.4,-5.6]),add(Pis,[0,12.2,-5.4])],.8,5,12,{...nfo,fade:far});                  // abdominal aorta
+          ah([AB,pp(2.3,7.1,-5.3),Bf],.42,5,10,nfo);                                                               // common iliac
+          ah([Bf,pp(4.3,4.3,-5.05),IId],.28,5,9,nfo);                                                              // internal iliac trunk
+          // posterior division
+          ah([IId,PD],.2,3,7,nfo);
+          ah([PD,pp(4.9,2.3,-6.8),pp(5.2,1.9,-7.9)],.16,4,7,{...nfo,fade:far});                                   // superior gluteal
+          ah([PD,pp(4.6,4.4,-6.3),pp(4.9,5.8,-6.6)],.09,4,6,{...nfo,fade:far});                                   // iliolumbar
+          ah([PD,pp(3.2,2.9,-6.6),pp(2,2.2,-6.9)],.08,4,6,{...nfo,fade:far});                                     // lateral sacral
+          // anterior division, ending as internal pudendal + inferior gluteal through the greater sciatic foramen
+          const A1=pp(4.85,2.35,-4.6), A2=pp(5,1.75,-4.25), A4=pp(5.05,.55,-4.05), A5=pp(4.85,-.1,-4.25);
+          ah([IId,A1,A2,pp(5.12,1.05,-4.1),A4,A5,pp(4.4,-1,-4.8),pp(4.1,-1.9,-5.4)],t=>.22-.08*t,5,8,{...nfo,fade:t=>1-smooth(.7,1,t)});
+          const SV=pp(4.2,1.2,1);                                                                                // umbilical a.: patent part → superior vesical
+          ah([A1,pp(5,2.3,-2.4),SV],.1,4,6,nfo).tag="umb-"+key;                                                     // umbilical a. (patent part) on the side wall
+          ah([SV,pp(2.6,0,2.6),add(add(Pis,[0,-2.3,3.9]),[s*1.6,.9,-.4])],.08,4,6,{...nfo,fade:t=>1-smooth(.85,1,t)}).tag="sva-"+key;   // superior vesical a. to the bladder
+          { const mu=nf(tubeMesh(catmull([SV,pp(4.7,2.1,4.1),pp(3.8,3.3,6.4),pp(1.6,6,6.8)],5),()=>.07,6,{col:C3.lig,a:.8,spec:.2,fade:far})); mu.tag="mul-"+key; meshes.push(mu); }   // medial umbilical ligament (obliterated umbilical a.) up the anterior wall
+          ah([A2,pp(5.6,.9,-1.5),pp(5.5,0,1.8),pp(5.1,-1.1,4.4)],.09,4,6,{...nfo,fade:far}).tag="obt-"+key;   // to the obturator canal, anterior, behind the pubis                      // obturator
+          ah([A4,pp(3.3,-1.2,-1.8),add(U.C[0],[s*1,-1.3,-.5])],.08,4,6,{...nfo,fade:far});                       // vaginal
+          ah([A5,pp(2.6,-1,-4.6),pp(1.3,-1.4,-4.4)],.07,4,6,{...nfo,fade:far});                                   // middle rectal
+          // origin of the uterine artery, marked
+          meshes.push(ellipsoid(AO,[.24,.24,.24],{seg:8,col:"#e0a400",a:.95,spec:.5}));
+          // descending cervicovaginal branch along the lateral cervix to the vaginal vault
+          ah([wallPt(.36),wallPt(.29,.15),wallPt(.2,-.12),wallPt(.1,.1),wallPt(.02),add(U.C[0],add(mul(X,s*.95),mul(U.Tg[0],-1.4)))],.06,5,6,{fade:t=>1-smooth(.6,1,t)});
+          // tubal branch in the mesosalpinx, running below the tube
+          const tp=P.slice(Math.round(tS*(P.length-1)),Math.round(P.length*.6)).map(q=>add(q,[0,-.32,-.08]));
+          ah([wallPt(.83,-.1),...tp.filter((q,i)=>i%3===0)],.045,4,6,{fade:t=>1-smooth(.7,1,t)});
+          // arcuate arteries in the outer third of the myometrium, half-rings to the midline (anastomosing with the other side),
+          // radial arteries running inwards, ending as coiled spiral arteries in the functional endometrium
+          const UP=(t,u,f)=>{ const k=U.at(t); return add(U.C[k],add(mul(X,U.A[k]*f*Math.cos(u)),mul(U.Nn[k],U.B[k]*f*Math.sin(u)))); };
+          const EP=(t,u,f)=>{ const k=U.at(t); return add(U.C[k],add(mul(X,U.AC[k]*f*Math.cos(u)),mul(U.Nn[k],U.BC[k]*f*Math.sin(u)))); };
+          const u0=s>0?0:Math.PI;
+          [.43,.5,.57,.64,.71,.78].forEach((t,li)=>{
+            const st=wallPt(t,li%2?.24:-.24);
+            for(const dir of [1,-1]){
+              const arc=[st,UP(t,u0,.86)]; for(let q=1;q<=6;q++) arc.push(UP(t,u0+dir*s*q/6*Math.PI/2*.97,.8));
+              ah(arc,.045,3,5);
+              for(const ph of [.5,1.2]){ const u=u0+dir*s*ph, a0=UP(t,u,.8), e0=EP(t,u,1.25), e1=EP(t,u,.55);
+                ah([a0,add(mul(a0,.5),mul(e0,.5)),e0],.028,2,4);
+                const ax=norm(sub(e1,e0)), Bs=G3.basis(ax), coil=[]; for(let q=0;q<=10;q++){ const f=q/10, w=f*Math.PI*2*2.5, r=.055*(1-.4*f); coil.push(add(add(e0,mul(sub(e1,e0),f)),add(mul(Bs.x,r*Math.cos(w)),mul(Bs.z,r*Math.sin(w))))); }
+                ah(coil,.016,1,3,{col:"#e0485a"});
+              }
+            }
+          });
+          // transvaginal uterine artery Doppler: sampled lateral to the cervix at the level of the internal os
+          const dp=add(Pis,[s*1.9,-.05,-.1]);
+          meshes.push(ellipsoid(dp,[.2,.2,.2],{seg:8,col:"#2f7dd1",a:.85,spec:.5}));
+          if(s===1){
+            const k6=U.at(.64), lab=[
+              [add(AB,[0,.6,0]),"Aortic bifurcation (~L4)","Ao"],[pp(2.3,7.1,-5.3),"Common iliac a.","CIA"],[pp(4.3,4.3,-5.05),"Internal iliac a.","IIA"],
+              [PD,"Posterior division","Post. div."],[pp(4.9,2.3,-6.8),"Superior gluteal a.","SGA"],[A1,"Anterior division","Ant. div."],
+              [pp(5,2.3,-2.4),"Umbilical a. → superior vesical","Umb./SVA"],[pp(5.6,.9,-1.5),"Obturator a.","Obt."],[pp(3.3,-1.2,-1.8),"Vaginal a.","Vag."],
+              [pp(2.6,-1,-4.6),"Middle rectal a.","MRA"],[pp(4.1,-1.9,-5.4),"Internal pudendal / inferior gluteal a.","IPA/IGA"],
+              [wallPt(.22,.2),"Cervicovaginal branch","CV br."],[tp[Math.min(tp.length-1,4)],"Tubal branch","Tubal"],
+              [UP(.71,u0+s*1.1,.8),"Arcuate a. (outer ⅓ myometrium)","Arcuate"],[UP(.5,u0+s*1.2,.55),"Radial a.","Radial"],[EP(.64,u0+s*1.2,.9),"Spiral a. (endometrium)","Spiral"],
+              [dp,"UtA Doppler site (TVS, internal os)","UtA PI"]];
+            lab.forEach(([p,t,sh])=>labels.push({p,t,short:sh}));
+            labels.push({p:AO,t:"Origin of uterine a. (anterior division of internal iliac)",short:"UtA origin",col:"#e0a400"});
+            labels.push({p:pp(3.4,2.6,4.6),t:"Medial umbilical lig. (obliterated umbilical a.)",short:"MUL"});
+          }
+        }
+      }
+      if(cfg.ctx){
+        // utero-ovarian ligament: from inside the uterine wall (posterior, below the tube) into the ovarian hilum, with fillets at both ends
+        if(o.vis!=="absent"){
+          const k74=U.at(.74), dU=norm(add(add(mul(X,s),mul(U.Nn[k74],-.5)),mul(U.Tg[k74],-.15))), rsU=rayExit(U.C[k74],dU,U.inS);
+          const u0=add(U.C[k74],mul(dU,rsU-.6)), u1=add(U.C[k74],mul(dU,rsU+.45)), toU=norm(sub(u1,loPole)), o1=add(ovExit(loPole,toU),mul(toU,.3)), o0=loPole, mid=add(mul(add(u1,o1),.5),[0,-.25,-.15]);
+          const uol=tubeMesh(catmull([u0,u1,mid,o1,o0],6),t=>.13+.24*(1-smooth(.03,.2,t))+.2*smooth(.78,.95,t),10,{col:C3.lig,a:.9,spec:.25}); uol.tag="uo-"+key; meshes.push(uol);
+          // infundibulopelvic (suspensory) ligament carrying the ovarian vessels: tubal pole → over the external iliac vessels at the brim
+          const ipl=nf(tubeMesh(catmull(IPP,6),t=>.16+.2*(1-smooth(.08,.26,t)),10,{col:"#c97f86",a:.55,spec:.25,fade:t=>1-smooth(.55,1,t)})); ipl.tag="ip-"+key; meshes.push(ipl);
+          if(s===1){ labels.push({p:mid,t:"Utero-ovarian (ovarian) lig.",short:"UOL"}); labels.push({p:IPP[2],t:"Infundibulopelvic (suspensory) lig.",short:"IPL"}); }
+        }
+        // round ligament: from the anterior cornu, below the tube, toward the deep inguinal ring
+        const kr=U.at(.8), dR=norm(add(add(mul(X,s),mul(U.Nn[kr],.6)),mul(U.Tg[kr],-.1))), rsR=rayExit(U.C[kr],dR,U.inS);
+        const r0=add(U.C[kr],mul(dR,rsR-.5)), r1=add(U.C[kr],mul(dR,rsR+.4));
+        // deep inguinal ring: on the anterior abdominal wall ~1.25 cm above the midpoint of the inguinal ligament, lateral to the inferior epigastric a.
+        const ring=add(Pis,[s*6.6,1.4,6.6]), w2=add(Pis,[s*5.2,2.4,4.4]), w3=add(Pis,[s*6.3,1.9,6]), rm=add(add(mul(r1,.5),mul(w2,.5)),[0,.3,0]);
+        const rl=nf(tubeMesh(catmull([r0,r1,rm,w2,w3,ring],7),t=>.12+.22*(1-smooth(.03,.12,t)),9,{col:C3.lig,a:.7,spec:.25})); rl.tag="round-"+key; meshes.push(rl);
+        // inguinal canal (~4 cm, medially, downwards and forwards) → superficial ring above the pubic tubercle → labium majus
+        const supR=add(Pis,[s*3.2,-2,7.4]), labM=add(supR,[-s*.4,-1.6,-.2]);   // superficial ring just above the pubic tubercle   // ends in the labium majus just beyond the superficial ring
+        const rc=nf(tubeMesh(catmull([ring,add(mul(add(ring,supR),.5),[0,0,.12]),supR,labM],6),()=>.12,8,{col:C3.lig,a:.7,spec:.2,fade:t=>.6*(1-smooth(.35,1,t))})); rc.tag="rcanal-"+key; meshes.push(rc);
+        meshes.push(nf(ellipsoid(ring,[.42,.13,.42],{axis:norm(sub(supR,ring)),seg:10,col:"#8a97a6",a:.35,spec:.2})));
+        if(s===1){ labels.push({p:rm,t:"Round lig.",short:"RL"}); labels.push({p:ring,t:"Deep inguinal ring",short:"DIR"}); labels.push({p:supR,t:"Inguinal canal → labium majus",short:"Ing. canal"}); }
+        // ureter: over the pelvic brim, down the side wall behind the ovarian fossa, under the uterine artery, into the bladder base
+        const bl=add(Pis,[0,-2.3,3.9]), ur=[add(Pis,[s*3.3,5.6,-4.4]),add(Pis,[s*4.1,2.6,-3.5]),add(Pis,[s*3.3,.2,-1.8]),add(Pis,[s*2.1,-.65,-.35]),add(Pis,[s*1.5,-1.3,1.1]),add(bl,[s*1.05,-.7,-1.75])];
+        meshes.push(nf(tubeMesh(catmull(ur,6),t=>.17,9,{col:C3.ureter,a:.9,spec:.3,fade:t=>smooth(0,.25,t)})));
+        // uterosacral ligament: from the posterolateral cervix (supravaginal) around the rectum to the sacrum
+        const kU=U.at(.3), us0=add(add(U.C[kU],mul(X,s*U.A[kU]*.45)),mul(U.Nn[kU],-U.B[kU]*.7));
+        const usl=nf(tubeMesh(catmull([us0,add(us0,[s*.45,-.05,-.9]),add(Pis,[s*1.9,.2,-3.6]),add(Pis,[s*1.4,1.4,-6])],7),t=>.13+.18*(1-smooth(.03,.2,t)),9,{col:C3.lig,a:.8,spec:.25,fade:t=>1-smooth(.4,1,t)})); usl.tag="usl-"+key; meshes.push(usl);
+        // cardinal (transverse cervical, Mackenrodt) ligament: a fan from the lateral cervix and vaginal fornix to the pelvic side wall
+        // at the base of the broad ligament; the uterine artery runs along its upper border
+        { const lv=[.36,.3,.24,.18,.12], cols=6, V=[], T=[], va=[];
+          lv.forEach((t,li)=>{ const k=U.at(t), m0=add(U.C[k],mul(X,s*U.A[k]*.95)), w=add(Pis,[s*5,-.1-1.8*li/(lv.length-1),-2.6-.3*li/(lv.length-1)]);
+            for(let c=0;c<=cols;c++){ const f=c/cols; V.push(add(add(mul(m0,1-f),mul(w,f)),[0,-.25*Math.sin(Math.PI*f),0])); va.push(1-smooth(.6,1,f)); } });
+          for(let i=0;i<lv.length-1;i++) for(let c=0;c<cols;c++){ const a=i*(cols+1)+c, b=a+cols+1; T.push([a,b,a+1],[a+1,b,b+1]); }
+          meshes.push(nf({V,T,va,col:C3.lig,a:.3,spec:.1,tag:"card-"+key}));
+          if(s===1) labels.push({p:V[2*(cols+1)+3],t:"Cardinal (transverse cervical) lig.",short:"CL"}); }
+        // pubocervical ligament: from the anterior cervix, beneath the bladder base and beside the bladder neck, to the back of the pubis
+        { const kp=U.at(.22), pc0=add(add(U.C[kp],mul(U.Nn[kp],U.B[kp]*.8)),mul(X,s*U.A[kp]*.4));
+          const pcl=nf(tubeMesh(catmull([pc0,add(Pis,[s*1.2,-2.9,1.4]),add(Pis,[s*1.1,-4.05,4]),add(Pis,[s*.9,-3.6,6.6])],6),t=>.1+.08*(1-smooth(.03,.2,t)),8,{col:C3.lig,a:.75,spec:.2,fade:t=>1-smooth(.6,1,t)})); pcl.tag="pc-"+key; meshes.push(pcl);
+          if(s===1) labels.push({p:add(Pis,[s*1.1,-4.05,4]),t:"Pubocervical lig.",short:"PCL"}); }
+        if(s===1){ labels.push({p:ur[2],t:"Ureter",short:"Ureter"}); labels.push({p:add(Pis,[s*1.9,.2,-3.6]),t:"Uterosacral lig.",short:"USL"}); }
+        // broad ligament: hangs from the tube (mesosalpinx); its medial edge follows the uterine side wall
+        const top=P.slice(Math.round(tS*(P.length-1)),Math.round(P.length*.72)), rows=7, V=[], T=[], floorY=U.C[U.at(.22)][1]-1.2;
+        top.forEach((tp,i)=>{ for(let r=0;r<=rows;r++){ const f=r/rows;
+          if(i===0){ const k=U.at(.86-.6*f); V.push(add(U.C[k],mul(X,s*U.A[k]*.97))); }
+          else V.push([tp[0]*(1-f*.12),tp[1]+(floorY-tp[1])*f,tp[2]-.35*f]); } });
+        for(let i=0;i<top.length-1;i++) for(let r=0;r<rows;r++){ const a=i*(rows+1)+r, c=a+rows+1; T.push([a,c,a+1],[a+1,c,c+1]); }
+        meshes.push(nf({V,T,col:"#f2b9b0",a:.07,spec:0,tag:"broad-"+key}));
+        if(s===1) labels.push({p:V[Math.round(top.length*.45)*(rows+1)+Math.round(rows*.55)],t:"Broad lig. (mesosalpinx / mesometrium)",short:"BL"});
+      }
+    }
+    lesPlaced.forEach(({L,calc,idx,c,Rr,hydro})=>{
+      const col=oradsCol(calc.fin);
+      if(hydro){ const A=adn[hydro]; labels.push({p:add(A.bound.c,[0,A.bound.R+1.7,0]),t:`A${idx+1} · hydrosalpinx · O-RADS ${calc.fin??"?"}`,short:`A${idx+1}·${calc.fin??"?"}`,col}); return; }
+      const p=lesionParts(L,c,Rr,idx+3,cfg.det);
+      meshes.push(...p.M); lines.push(...p.Ln); labels.push(...p.Lb);
+      labels.push({p:[c[0],p.top+.6,c[2]],t:`A${idx+1} · ${calc.iota.type} · O-RADS ${calc.fin??"?"}`,short:`A${idx+1}·${calc.fin??"?"}`,col});
+    });
+  }
+  /* free fluid, ascites, peritoneal nodules */
+  const gl=cfg.gl||{}, k30=U.at(.3);
+  if((gl.pod&&gl.pod!=="none")||gl.ascites){ const big=gl.pod==="moderate"||gl.ascites, c=add(U.C[k30],[0,-.9,-(U.B[k30]+(big?1.5:1.1))]);   // pouch of Douglas: behind the cervix / posterior fornix
+    meshes.push(ellipsoid(c,big?[2.8,1.1,1.6]:[1.6,.6,.9],{seg:12,col:C3.fluid,a:.3,spec:.6})); labels.push({p:add(c,[0,-1.5,0]),t:"Pouch of Douglas fluid",short:"PoD"}); }
+  if(gl.ascites){ const k5=U.at(.5), tp=[0,Math.max(...serosa.V.map(v=>v[1]))+1.5,U.C[k5][2]];
+    meshes.push(nf(ellipsoid(tp,[6.5,1.1,4],{seg:14,col:C3.fluid,a:.16})));
+    meshes.push(ellipsoid(add(U.C[k5],mul(U.Nn[k5],U.B[k5]+1)),[2.5,.8,1],{seg:10,col:C3.fluid,a:.22}));
+    labels.push({p:add(tp,[4.5,1.4,0]),t:"Ascites",short:"Ascites"}); }
+  if(gl.nodules){ let last;
+    for(let i=0;i<9;i++){ const k=U.at(.25+.6*rnd()), ang=Math.PI*(1.15+.7*rnd()), q=add(U.C[k],add(mul(X,U.A[k]*1.08*Math.cos(ang)),mul(U.Nn[k],U.B[k]*1.08*Math.sin(ang)))), rr=.2+.25*rnd();
+      meshes.push(ellipsoid(q,[rr,rr*.8,rr],{seg:7,col:"#b5524a",noise:(x,y,z)=>1+.2*Math.sin(9*x)*Math.cos(7*y+z)})); last=q; }
+    labels.push({p:add(last,[0,-.9,-.5]),t:"Peritoneal nodules",short:"Nodules"}); }
+  if(cfg.ctx){ const c=add(U.C[U.at(.36)],[0,-2.3,3.9]);   // bladder: in front of the cervix, the anteverted body rests on its dome
+    const bm=ellipsoid(c,[3.1,1.8,2.2],{seg:16,col:C3.bladder,a:.055,spec:.3});
+    // the uterus indents the bladder dome instead of passing through it
+    bm.V=bm.V.map(v=>{ let q=v, n=0; while(U.inS(q)&&n++<60) q=[q[0],q[1]-.06,q[2]+(q[2]<c[2]?.03:0)]; return n?[q[0],q[1]-.12,q[2]]:q; });
+    meshes.push(nf(bm)); labels.push({p:add(c,[0,-2.2,0]),t:"Bladder",short:"Bladder"}); }
+  // auto-fit: centre the scene on its bounding box and size the camera to a bounding sphere
+  let lo=[1e9,1e9,1e9], hi=[-1e9,-1e9,-1e9];
+  meshes.forEach(m=>!m.nofit&&m.V.forEach(v=>{ for(let k=0;k<3;k++){ if(v[k]<lo[k]) lo[k]=v[k]; if(v[k]>hi[k]) hi[k]=v[k]; } }));
+  const ctr=lo.map((v,k)=>(v+hi[k])/2), sh=v=>G3.sub(v,ctr);
+  meshes.forEach(m=>{ m.V=m.V.map(sh); }); lines.forEach(l=>{ l.a=sh(l.a); l.b=sh(l.b); }); labels.forEach(l=>{ l.p=sh(l.p); });
+  const Rb=Math.max(4.5,.5*Math.hypot(hi[0]-lo[0],hi[1]-lo[1],hi[2]-lo[2]));
+  const ucor={yaw:0,pitch:Math.max(-1.5,Math.min(1.5,-U.bodyDeg*Math.PI/180))};   // looking along the AP axis of the body
+  return cfg.adnexa ? {meshes,lines,labels,extent:Rb*.66,extentW:Rb*.86,view:{yaw:.55,pitch:.22},ucor} : {meshes,lines,labels,extent:5,extentW:7.2,view:{yaw:.3,pitch:ucor.pitch+.12},ucor};
+}
+
+function caseCfg(){
+  const fibs=S.fib.map((f,i)=>{ const c=fibCalc(f); return {code:c.code,loc:f.loc,ect:f.ect,r:c.max?Math.min(8,c.max/2):1,label:`F${i+1} · FIGO ${c.code}`,short:`F${i+1}·${c.code}`}; });
+  const bad=getComputedStyle(document.documentElement).getPropertyValue("--bad").trim(), ov={};
+  for(const k of ["R","L"]){ const o=S.ov[k], c=ovCalc(o,S.pt.meno);
+    const fol = o.fol!==""&&o.fol!=null ? Math.max(0,parseInt(o.fol)||0) : (S.pt.meno==="pre"?5:0);
+    ov[k]={vis:o.vis,dims:[num(o.l)||3.2,num(o.w)||2,num(o.h)||1.6],fol,label:`${k==="R"?"Right":"Left"} ovary${c.v!=null?` · ${f1(c.v)} mL`:""}${c.enlarged?" · enlarged":""}`,col:c.enlarged?bad:null}; }
+  return {ut:{L:num(S.ut.l)||7.5,W:num(S.ut.w)||4.8,AP:num(S.ut.ap)||3.8,pos:S.ut.pos,et:num(S.ut.et)||(S.pt.meno==="pre"?8:3)},
+    fibs,ov,les:S.les.map((L,idx)=>({L,calc:lesCalc(L),idx})),gl:S.gl,ctx:!!S.ui.ctx,art:!!S.ui.art,det:!!S.ui.det,adnexa:true};
+}
+const FIGO_REF=[["0","fundal",null,"0 pedunculated, intracavitary"],["1","right lateral",.74,"1 submucosal, <50% intramural"],["2","left lateral",.74,"2 submucosal, ≥50% intramural"],["3","anterior",.72,"3 contacts endometrium"],["4","posterior",.72,"4 intramural"],
+  ["5","right lateral",.5,"5 subserosal, ≥50% intramural"],["6","left lateral",.5,"6 subserosal, <50% intramural"],["7","right cornual",null,"7 pedunculated subserosal"],["2–5","anterior",.5,"2–5 hybrid"],["8","cervical",null,"8 cervical / other"]];
+function figoCfg(){
+  return {ut:{L:8,W:5,AP:4,pos:"anteverted",et:8},fibs:FIGO_REF.map(([code,loc,tb,label])=>({code,loc,tb,r:.6,ect:code==="8"?"cervical":"none",label,short:code})),
+    ov:{},les:[],gl:{},ctx:false,det:false,adnexa:false,refLabels:true};
+}
+
+const CONT={anechoic:"#22344a","low-level":"#6c7c8d","ground-glass":"#c4b08c",hemorrhagic:"#9a5f4b",mixed:"#cfc19f",variable:"#55789a",none:"#c4b08c"};
+const SOLC={1:"#d8c4a4",2:"#dba17c",3:"#d8735a",4:"#c8343c"};
+function lesionParts(L,off,sc,seed,withLabels){
+  const {ellipsoid,disc,quad,norm,add,mul}=G3, R=G3.rng(seed);
+  const dd=[num(L.d1),num(L.d2),num(L.d3)], have=dd.filter(Boolean), mx=have.length?Math.max(...have):50;
+  const r = have.length ? dd.map(d=>(d||mx*.85)/mx*sc) : [sc,sc*.85,sc*.8];
+  const u = 2*sc/mx; // mm → scene units
+  const M=[],Ln=[],Lb=[], cs=+L.cs||0, solidCol=SOLC[cs]||"#d9b48f", pp=parseInt(L.pp)||0;
+  const surf=(d,k=1)=>add(off,[d[0]*r[0]*k,d[1]*r[1]*k,d[2]*r[2]*k]);
+  const inward=d=>mul(norm([d[0]/r[0],d[1]/r[1],d[2]/r[2]]),-1);
+  let shadowSrc=null;
+  const callout=(p,dir,t)=>{ const q=add(off,mul(norm(dir),Math.max(...r)+.5*sc)); Ln.push({a:p,b:q,col:"rgba(128,128,128,.75)",w:1,lbl:true}); Lb.push({p:q,t}); };
+  if(L.solidTumor){
+    const irr=L.contour==="irregular";
+    M.push(ellipsoid(off,r,{seg:20,col:solidCol,a:.82,noise:irr?(x,y,z)=>1+.13*Math.sin(5*x+1.3)*Math.sin(4*y+.4)*Math.cos(3.5*z+.8):null}));
+    M.push(ellipsoid(add(off,[r[0]*.3,r[1]*.2,r[2]*.25]),[.16*sc,.14*sc,.15*sc],{seg:8,col:CONT.anechoic,a:.9}));
+    M.push(ellipsoid(add(off,[-r[0]*.35,-r[1]*.15,r[2]*.2]),[.11*sc,.1*sc,.1*sc],{seg:8,col:CONT.anechoic,a:.9}));
+    shadowSrc=[off[1]-r[1]*.9,r[0]*.5];
+  } else {
+    const cc=CONT[L.contents]||CONT.anechoic, ca=L.contents==="anechoic"?.3:L.contents==="ground-glass"?.5:.38;
+    M.push(ellipsoid(off,r,{seg:18,col:cc,a:ca}));
+    const planes = L.loc==="2"?[[0,0]] : L.loc==="3-10"?[[0,-.35],[0,.35],[1,0]] : L.loc===">10"?[[0,-.5],[0,0],[0,.5],[1,-.35],[1,.35],[2,0]] : [];
+    for(const [ax,f] of planes){
+      const n=[0,0,0]; n[ax]=1; const s=Math.sqrt(Math.max(0,1-f*f)), rr=r.map((v,i)=>i===ax?0:v*s*.99), c=[...off]; c[ax]+=f*r[ax];
+      M.push(disc(c,n,rr,{col:"#ead9cf",a:.5}));
+    }
+    const PD=[[0,-1,.25],[.55,-.75,.35],[-.55,-.75,.3],[.25,-.45,.85],[-.35,-.4,-.8]].map(norm);
+    const n=pp>=4?5:pp, ph=num(L.ph);
+    const h=Math.min(.6*sc,Math.max(.1*sc,(ph||8)*u)), b=Math.min(.6*sc,Math.max(.1*sc,(num(L.pb1)||(ph||8)*1.1)*u));
+    for(let i=0;i<n;i++){ const d=PD[i], p=surf(d,.985), w=inward(d), hh=h*(i?.75:1), bb=b*(i?.8:1);
+      M.push(ellipsoid(add(p,mul(w,hh/2)),[bb/2,hh/2,bb/2],{seg:9,axis:w,col:solidCol})); }
+    if(n && withLabels) callout(add(surf(PD[0],.985),mul(inward(PD[0]),h*.6)),[1,-.55,.2],(pp>=4?"≥4":pp)+" papillary proj.");
+    if(L.flat){ const d=norm([-.7,.35,.6]), p=surf(d,.985), w=inward(d), bb=Math.max(.22*sc,(num(L.pb1)||6)*u);
+      M.push(ellipsoid(add(p,mul(w,.02*sc)),[bb/2,.04*sc,bb/2],{seg:9,axis:w,col:solidCol}));
+      if(withLabels) callout(p,[-1,.45,0],"flat solid, <3 mm high"); }
+    if(L.otherSolid){ const sd=[num(L.s1),num(L.s2),num(L.s3)].filter(Boolean), rs=Math.min(.45*sc,Math.max(.12*sc,(sd.length?Math.max(...sd):12)*u/2));
+      const d=norm([.65,.3,.6]), c=add(surf(d,1),mul(inward(d),rs*.75));
+      M.push(ellipsoid(c,[rs,rs*.9,rs*.95],{seg:12,col:solidCol}));
+      if(withLabels) callout(c,[1,.5,0],"solid component"); }
+    if(L.tiny) for(const d0 of [[.3,.9,.3],[0,.95,-.3],[-.35,.85,.35]]){ const d=norm(d0), p=surf(d,.99), w=inward(d);
+      M.push(ellipsoid(add(p,mul(w,.015*sc)),[.05*sc,.025*sc,.05*sc],{seg:6,axis:w,col:solidCol})); }
+    if(L.contents==="mixed"){ const c=add(off,[r[0]*.15,-r[1]*.4,0]), rb=Math.min(...r)*.38;
+      M.push(ellipsoid(c,[rb,rb,rb],{seg:12,col:"#f3efe4"}));
+      for(let i=0;i<9;i++){ const a=add(off,[(R()-.5)*r[0]*1.1,(R()-.2)*r[1]*.9,(R()-.5)*r[2]*1.1]); Ln.push({a,b:add(a,[(R()-.5)*.5*sc,(R()-.5)*.08*sc,(R()-.5)*.3*sc]),col:"rgba(150,128,80,.9)",w:1.6}); }
+      if(withLabels) callout(c,[-1,-.2,0],"white ball (not solid)");
+      shadowSrc=[c[1]-rb*.9,rb*.9]; }
+    if(L.contents==="hemorrhagic") for(let i=0;i<16;i++){ const a=add(off,[(R()-.5)*r[0]*1.3,(R()-.5)*r[1]*1.3,(R()-.5)*r[2]*1.3]);
+      Ln.push({a,b:add(a,[(R()-.5)*.6*sc,(R()-.5)*.6*sc,(R()-.5)*.6*sc]),col:"rgba(225,190,170,.85)",w:1}); }
+    if(!shadowSrc) shadowSrc=[off[1]-r[1]*.95,r[0]*.35];
+  }
+  const nv=({2:6,3:14,4:26})[cs]||0;
+  for(let i=0;i<nv;i++){ const d=norm([R()-.5,R()-.5,R()-.5]), d2=norm(add(d,[(R()-.5)*.35,(R()-.5)*.35,(R()-.5)*.35]));
+    Ln.push({a:surf(d,1.01),b:surf(d2,1.01),col:"rgba(226,58,50,.95)",w:2}); }
+  if(L.shadow){ const [y0,w0]=shadowSrc, y1=y0-1.1*sc, w1=w0+.9*sc, cx=off[0], cz=off[2];
+    M.push(quad([[cx-w0,y0,cz],[cx+w0,y0,cz],[cx+w1,y1,cz],[cx-w1,y1,cz]],{col:"#1a2230",a:.13}));
+    M.push(quad([[cx,y0,cz-w0],[cx,y0,cz+w0],[cx,y1,cz+w1],[cx,y1,cz-w1]],{col:"#1a2230",a:.13}));
+    if(withLabels) Lb.push({p:[cx,y1-.08*sc,cz],t:"acoustic shadow"}); }
+  return {M,Ln,Lb,top:off[1]+r[1]};
+}
+const IOTA_REF=[
+  ["Unilocular",{loc:"1",contents:"anechoic",cs:"1"}],
+  ["Unilocular-solid",{loc:"1",contents:"low-level",pp:"2",ph:"12",pb1:"11",cs:"3"}],
+  ["Multilocular",{loc:"3-10",contents:"low-level",cs:"2"}],
+  ["Multilocular-solid",{loc:"3-10",contents:"low-level",otherSolid:true,s1:"16",cs:"3"}],
+  ["Solid tumor",{solidTumor:true,contour:"smooth",cs:"2",contents:"none"}]
+];
+const oradsCol = n => n==null ? null : getComputedStyle(document.documentElement).getPropertyValue("--o"+n).trim();
+
+function adnexScene(){
+  const meshes=[],lines=[],labels=[];
+  IOTA_REF.forEach(([name,o],i)=>{ const x=(i-2)*2.3, p=lesionParts(Object.assign(newLes(),{d1:"50",d2:"42",d3:"40"},o),[x,0,0],.9,i+7,false);
+    meshes.push(...p.M); lines.push(...p.Ln); labels.push({p:[x,i%2?1.2:-1.2,0],t:name}); });
+  return {meshes,lines,labels,extent:1.5,extentW:5.7,view:{yaw:0,pitch:.22}};
+}
+
+let viewer=null;
+// abbreviations that can appear in 3D labels (full and short forms) or the legend → footnote, listed only when on screen
+const ABBR=[["a.","artery"],["lig.","ligament"],["br.","branch"],["Ant. div.","anterior division of the internal iliac artery"],["Post. div.","posterior division of the internal iliac artery"],
+  ["Ao","aortic bifurcation"],["L4","4th lumbar vertebra"],["CIA","common iliac artery"],["EIA","external iliac artery"],["IIA","internal iliac artery"],["SGA","superior gluteal artery"],
+  ["Umb.","umbilical artery"],["SVA","superior vesical artery"],["Obt.","obturator artery"],["Vag.","vaginal artery"],["MRA","middle rectal artery"],["IPA","internal pudendal artery"],["IGA","inferior gluteal artery"],
+  ["Ut a.","uterine artery"],["UtA","uterine artery"],["CV br.","cervicovaginal branch"],["Anast.","anastomosis"],["PI","pulsatility index"],["TVS","transvaginal sonography"],
+  ["RL","round ligament"],["UOL","utero-ovarian (ovarian) ligament"],["IPL","infundibulopelvic (suspensory) ligament"],["BL","broad ligament"],["CL","cardinal (transverse cervical) ligament"],
+  ["USL","uterosacral ligament"],["PCL","pubocervical ligament"],["MUL","medial umbilical ligament"],["IEA","inferior epigastric artery"],["DIR","deep inguinal ring"],["Ing.","inguinal"],
+  ["Cx","cervix"],["ov","ovary"],["R","right (patient)"],["L","left (patient)"],["PoD","pouch of Douglas"],["mL","millilitre"],["proj.","projection"],
+  ["F1","fibroid number (F1, F2 …)"],["A1","adnexal lesion number (A1, A2 …)"],["FIGO","International Federation of Gynecology and Obstetrics (leiomyoma types 0–8)"],
+  ["O-RADS","Ovarian-Adnexal Reporting and Data System (ACR)"],["IOTA","International Ovarian Tumor Analysis"]];
+const ABBR_RE=ABBR.map(([k,v])=>{ const e=k.replace(/[.*+?^${}()|[\]\\]/g,"\\$&").replace(/1$/,"\\d+"); return [k,v,new RegExp("(^|[\\s(/·→↔,–-])"+e+(/[.]$/.test(k)?"":"(?![A-Za-z0-9])"),"")]; });
+function renderAbbr(texts){
+  const el=$("v3abbr"); if(!el) return;
+  const hay=" "+[...(texts||[]),$("v3legend").innerText].join(" \n ")+" ";
+  const used=ABBR_RE.filter(([k,v,re])=>re.test(hay));
+  el.innerHTML=used.length?"<b>Abbreviations:</b> "+used.map(([k,v])=>`<b>${esc(k)}</b> ${esc(v)}`).join(" · "):"";
+  el.style.display=used.length?"":"none";
+}
+const VIEWS={cor:{yaw:0,pitch:.06},sag:{yaw:Math.PI/2,pitch:.06},obl:{yaw:.55,pitch:.24},top:{yaw:0,pitch:1.38}};
+function refresh3D(){
+  if(!viewer) return;
+  const ui=S.ui;
+  document.querySelectorAll("#v3tabs button").forEach(b=>b.classList.toggle("on",b.dataset.v===ui.v));
+  $("v3ctx").checked=!!ui.ctx; $("v3art").checked=!!ui.art; $("v3det").checked=!!ui.det;
+  $("v3layers").style.display = ui.v==="case" ? "" : "none";
+  const sw=(c,t)=>`<span><i style="background:${c}"></i>${t}</span>`, ln=(c,t)=>`<span><i class="ln" style="background:${c}"></i>${t}</span>`;
+  const fibL=Object.keys(FIBGRP).map(g=>sw(C3[g],FIBGRP[g])).join("");
+  const lesL=sw(CONT.anechoic,"Anechoic")+sw(CONT["low-level"],"Low-level")+sw(CONT["ground-glass"],"Ground-glass")+sw(CONT.hemorrhagic,"Hemorrhagic")
+    +`<span><i style="background:linear-gradient(90deg,${SOLC[1]},${SOLC[4]})"></i>Solid tissue (tint = color score 1→4)</span>`+ln("#e23a32","Doppler flow")+sw("#ead9cf","Septum")+sw("#1a2230","Acoustic shadow");
+  let scene, legend, cap;
+  if(ui.v==="iota"){
+    scene=adnexScene(); legend=lesL;
+    cap="IOTA lesion types: unilocular · unilocular-solid · multilocular · multilocular-solid · solid tumor (≥80% solid). A solid component needs a diameter of at least 3 mm, and a papillary projection needs a height of at least 3 mm.";
+  } else if(ui.v==="figo"){
+    scene=pelvisScene(figoCfg()); legend=fibL+sw(C3.myo,"Myometrium / serosa")+sw(C3.endo,"Endometrium");
+    cap="FIGO 0–8 on an average uterus (8 × 5 × 4 cm, anteverted). The serosa bulges over intramural and subserosal fibroids, the cavity deforms around submucosal ones, and types 0 and 7 hang on stalks.";
+  } else {
+    const cfg=caseCfg(); scene=pelvisScene(cfg);
+    legend=sw(C3.myo,"Myometrium")+sw(C3.endo,"Endometrium / canal")+sw(C3.ovary,"Ovary")+sw(C3.follicle,"Follicle")+sw(C3.tube,"Tube")
+      +(ui.ctx?sw(C3.lig,"Ligaments")+sw(C3.ureter,"Ureter")+sw(C3.bladder,"Bladder"):"")+(ui.ctx||ui.art?sw(C3.art,"Arteries"):"")+(ui.art?sw("#e0a400","Uterine a. origin")+sw("#e0485a","Spiral arteries")+sw("#2f7dd1","UtA Doppler site"):"")+sw(C3.fluid,"Fluid")+(S.fib.length?fibL:"")+(S.les.length?lesL:"");
+    const u=cfg.ut, defaults=[!num(S.ut.l)&&"uterus",["R","L"].some(k=>S.ov[k].vis==="visualized"&&!num(S.ov[k].l))&&"ovaries"].filter(Boolean);
+    cap=`Uterus ${f1(u.L)} × ${f1(u.W)} × ${f1(u.AP)} cm, ${u.pos} · ${S.fib.length} fibroid${S.fib.length===1?"":"s"} · ${S.les.length} adnexal lesion${S.les.length===1?"":"s"}. Drawn to scale in cm from the entered measurements`
+      +(defaults.length?`; typical adult sizes are used for the ${defaults.join(" and ")} (not entered)`:"")
+      +". Follicles are shown from the antral count, or 5 by default if premenopausal. Positions are schematic."
+      +(ui.art?" Arterial supply: aorta → common iliac → internal iliac, which divides into a posterior division (iliolumbar, lateral sacral, superior gluteal) and an anterior division (umbilical → superior vesical, obturator, uterine, vaginal, middle rectal, internal pudendal, inferior gluteal). The uterine artery arises from the anterior division (often from a common trunk with the umbilical artery; the branching order varies) and runs medially in the base of the broad ligament (crosses over the ureter ~2 cm lateral to the cervix, reaches the uterus at the internal os) → ascending branch along the lateral wall, descending cervicovaginal branch → arcuate arteries in the outer third of the myometrium → radial arteries → basal and spiral arteries in the endometrium. The ovarian artery (from the aorta, in the infundibulopelvic ligament) anastomoses with the uterine artery below the tube.":"");
+  }
+  $("v3legend").innerHTML=legend; $("v3cap").textContent=cap;
+  viewer.set(scene,ui.v);
+  renderAbbr(viewer.shownTexts);
+}
+
+
+let tt; function toast(m){ const el=$("toast"); el.textContent=m; el.classList.add("on"); clearTimeout(tt); tt=setTimeout(()=>el.classList.remove("on"),1600); }
+
+viewer = new G3.View($("v3"));
+$("v3auto").onclick = ()=>{ viewer.setAuto(!viewer.auto); $("v3auto").classList.toggle("on",viewer.auto); };
+$("v3reset").onclick = ()=>viewer.reset();
+const syncLbl=()=>{ const on=S.ui.lbl!==false; $("v3lbl").classList.toggle("on",on); $("v3lbl").setAttribute("aria-pressed",on); viewer.setLabels(on); };
+viewer.onLabels=renderAbbr;
+$("v3lbl").onclick = ()=>{ S.ui.lbl = S.ui.lbl===false; save(); syncLbl(); };
+document.addEventListener("keydown",e=>{ if((e.key==="l"||e.key==="L")&&!e.metaKey&&!e.ctrlKey&&!e.altKey&&!/INPUT|SELECT|TEXTAREA/.test(document.activeElement.tagName)&&!$("guide").open){ $("v3lbl").click(); } });
+syncLbl();
+renderAll();
+</script>
+<script>/* offline web app: keep all files on the device after the first visit */
+if('serviceWorker' in navigator && (location.protocol==='https:'||location.hostname==='localhost'||location.hostname==='127.0.0.1')){
+  addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(()=>{}));}
+</script>
+</body>
+</html>

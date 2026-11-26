@@ -1,0 +1,31 @@
+{
+ "name": "SakitaGYNUSreporter",
+ "short_name": "SakitaGYNUSreporter",
+ "id": "./",
+ "start_url": "./",
+ "scope": "./",
+ "display": "standalone",
+ "background_color": "#f4f6f8",
+ "theme_color": "#0e6f86",
+ "description": "Gynecologic ultrasound reporter (O-RADS US v2022, IOTA 2026, FIGO, MUSA) with 3D pelvis model. Works offline.",
+ "icons": [
+  {
+   "src": "icon-192.png",
+   "sizes": "192x192",
+   "type": "image/png",
+   "purpose": "any"
+  },
+  {
+   "src": "icon-512.png",
+   "sizes": "512x512",
+   "type": "image/png",
+   "purpose": "any"
+  },
+  {
+   "src": "icon-512.png",
+   "sizes": "512x512",
+   "type": "image/png",
+   "purpose": "maskable"
+  }
+ ]
+}
