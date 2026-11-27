@@ -1,6 +1,6 @@
 // Offline cache for SakitaGYNUSreporter. The cache name changes whenever any file changes, so a new upload replaces the old copy
 // on the next online launch; until then (and whenever offline) the stored copy is used.
-const CACHE = 'sakita-gynus-9c46f0c2e1';
+const CACHE = 'sakita-gynus-e05588b8bd';
 const FILES = ["./", "index.html", "manifest.webmanifest", "icon-180.png", "icon-192.png", "icon-512.png"];
 self.addEventListener('install', e => {
   e.waitUntil(caches.open(CACHE).then(c => c.addAll(FILES.map(f => new Request(f, {cache: 'reload'})))).then(() => self.skipWaiting()));

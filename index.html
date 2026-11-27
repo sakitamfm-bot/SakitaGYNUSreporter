@@ -47,7 +47,8 @@ button.primary:hover{filter:brightness(1.07)}
 button.ghost{border-style:dashed;width:100%;padding:9px}
 button.del{color:var(--bad);border-color:transparent;padding:3px 8px}
 .app{display:grid;grid-template-columns:minmax(0,1fr);gap:16px;padding:16px;max-width:1500px;margin:0 auto}
-@media (min-width:1060px){.app{grid-template-columns:minmax(0,1.15fr) minmax(0,.85fr)}.out{position:sticky;top:70px;align-self:start;max-height:calc(100vh - 86px);overflow:auto}}
+/* wide screens: 3D panel + report on the left (larger, stays in view), measurements on the right */
+@media (min-width:1060px){.app{grid-template-columns:minmax(0,1.45fr) minmax(0,1fr);max-width:1820px}.out{order:-1;position:sticky;top:70px;align-self:start;max-height:calc(100vh - 86px);overflow:auto}.out .v3wrap{height:clamp(460px,calc(100vh - 300px),900px)}}
 .card{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:14px 14px 10px;margin-bottom:14px}
 .card h2{font-size:14px;margin:0 0 10px;display:flex;align-items:center;gap:8px}
 .card h2 .n{display:inline-grid;place-items:center;width:22px;height:22px;border-radius:50%;background:var(--soft);font-size:12px;color:var(--muted)}
