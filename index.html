@@ -1064,9 +1064,8 @@ const G3 = (()=>{
       // Keep clear of the hint (top left) and the toolbar (bottom right).
       const tb=this.cv.parentElement&&this.cv.parentElement.querySelector(".v3tools"), tbh=tb?tb.offsetHeight+16:0;
       const top=30, bot={L:H-12,R:H-12-tbh}, step=21, capOf=c=>Math.max(1,Math.floor((bot[c]-top)/step)+1);
-      // split at the median anchor x so both sides carry about the same number of labels
-      const xs=LBS.filter(L=>!L.lb.nolead).map(L=>L.q[0]).sort((a,b)=>a-b), mx=xs.length?(xs[(xs.length-1)>>1]+xs[xs.length>>1])/2:W/2;
-      const col={L:[],R:[]}; for(const L of LBS) col[(L.lb.nolead?L.q[0]<W/2:L.q[0]<mx)?"L":"R"].push(L);
+      // a label goes to the gutter on its structure's side of the screen, so leader lines don't cross the model
+      const col={L:[],R:[]}; for(const L of LBS) col[L.q[0]<W/2?"L":"R"].push(L);
       const mv=(a,b)=>{ col[a].sort((u,v)=>a==="L"?u.q[0]-v.q[0]:v.q[0]-u.q[0]); col[b].push(col[a].pop()); };
       while(col.L.length>capOf("L")&&col.R.length<capOf("R")) mv("L","R");
       while(col.R.length>capOf("R")&&col.L.length<capOf("L")) mv("R","L");
@@ -1123,13 +1122,13 @@ function sweepMesh(G,A,B,i0,i1,M,o){
   return ringMesh(rings,M,o);
 }
 function tubeMesh(P,rf,M,o){
-  const {add,mul,sub,norm,cross}=G3, n=P.length, rings=[];
+  const {add,mul,sub,norm,cross}=G3, n=P.length, rings=[], rr=[];
   for(let i=0;i<n;i++){
     const tg=norm(sub(P[Math.min(n-1,i+1)],P[Math.max(0,i-1)])), ax=Math.abs(tg[1])<.95?[0,1,0]:[1,0,0], x=norm(cross(ax,tg)), z=cross(tg,x), r=rf(i/(n-1)), ring=[];
     for(let j=0;j<M;j++){ const u=j/M*Math.PI*2; ring.push(add(P[i],add(mul(x,r*Math.cos(u)),mul(z,r*Math.sin(u))))); }
-    rings.push(ring);
+    rings.push(ring); rr.push(r);
   }
-  const m=ringMesh(rings,M,o);
+  const m=ringMesh(rings,M,o); m.ring=M; m.rr=rr;
   if(o.fade){ m.va=[]; for(let i=0;i<n;i++){ const f=o.fade(i/(n-1)); for(let j=0;j<M;j++) m.va.push(f); } }
   if(o.col2){ const c1=hex3(o.col), c0=hex3(o.col2); m.vc=[]; for(let i=0;i<n;i++){ const k=o.mix(i/(n-1)), c=[0,1,2].map(q=>c0[q]+(c1[q]-c0[q])*k); for(let j=0;j<M;j++) m.vc.push(c); } }
   return m;
@@ -1233,11 +1232,11 @@ function pelvisScene(cfg){
       grp.forEach(p=>{ y=Math.min(p.c[1],y-1.05); const lab=[sd*(maxA+3.6),y,0]; lines.push({a:p.c,b:lab,col:"rgba(128,128,128,.7)",w:1,lbl:true}); labels.push({p:lab,t:p.f.label,short:p.f.short,col:C3[fibGroup(p.f.code)]}); });
     }
   } else placed.forEach(p=>labels.push({p:add(p.c,[0,p.r+.55,0]),t:p.f.label,short:p.f.short,col:C3[fibGroup(p.f.code)]}));
-  labels.push({p:add(U.C[N],mul(U.Tg[N],.9)),t:`Uterus · ${cfg.ut.pos}`,short:"Uterus"});
-  labels.push({p:add(U.C[0],mul(U.Tg[0],-.8)),t:"Cervix",short:"Cx"});
+  labels.push({p:U.C[N],t:`Uterus · ${cfg.ut.pos}`,short:"Uterus"});
+  labels.push({p:U.C[0],t:"Cervix",short:"Cx"});
 
   /* adnexa: ovaries in the ovarian fossae, tubes arching over them, lesions by origin */
-  const kIs=U.at(.36), Pis=U.C[kIs], adn={};   // isthmus: fixed pelvic reference (supported by the cardinal and uterosacral ligaments)
+  const kIs=U.at(.36), Pis=U.C[kIs], adn={}, lesVol=[], nUt=meshes.length;   // isthmus: fixed pelvic reference (supported by the cardinal and uterosacral ligaments)
   if(cfg.adnexa){
     for(const [key,s] of [["R",-1],["L",1]]){
       const o=cfg.ov[key], r=[o.dims[1]/2,o.dims[0]/2,o.dims[2]/2], ovR=Math.max(...r);
@@ -1248,21 +1247,29 @@ function pelvisScene(cfg){
       adn[key]={s,o,oc,ovc:oc,r,ovR,bound:{c:oc,R:ovR},swell:0,n:0};
     }
     const lesPlaced=[]; let midStack=0;
+    // a mass never overlaps the uterus or the bladder: it is moved away (laterally / posteriorly) until it just touches them
+    const blC0=add(Pis,[0,-2.3,3.9]), blR0=[3.1,1.8,2.2];
+    const clearOf=(c,R,s)=>{
+      for(let it=0;it<12;it++){ let best=1e9,bv=null; for(const v of serosa.V){ const d=G3.len(sub(v,c)); if(d<best){ best=d; bv=v; } }
+        const inside=U.inS(c), pen=R+.15-best; if(!inside&&pen<=0) break;
+        const dir=inside?(s?[s,0,0]:[0,0,-1]):norm(sub(c,bv)); c=add(c,mul(dir,Math.max(.15,inside?R*.5:pen))); }
+      for(let it=0;it<8;it++){ const d=sub(c,blC0), n=Math.hypot(d[0]/(blR0[0]+R+.1),d[1]/(blR0[1]+R+.1),d[2]/(blR0[2]+R+.1)); if(n>=1) break; c=add(blC0,mul(d,1.03/Math.max(n,.05))); }
+      return c; };
     cfg.les.forEach(({L,calc,idx})=>{
       const key=L.side==="Left"?"L":L.side==="Right"?"R":"M", Rr=(calc.maxmm||40)/20;
-      if(key==="M"){ const k=U.at(.3), c=add(U.C[k],[0,-.4,-(U.B[k]+Rr+.5+midStack)]); midStack+=2*Rr+.3; lesPlaced.push({L,calc,idx,c,Rr}); return; }
+      if(key==="M"){ const k=U.at(.3), c=clearOf(add(U.C[k],[0,-.4,-(U.B[k]+Rr+.5+midStack)]),Rr,0); midStack+=2*Rr+.3; lesPlaced.push({L,calc,idx,c,Rr}); return; }
       const A=adn[key], s=A.s;
       if(L.classic==="hydrosalpinx"){ const dd=[num(L.d1),num(L.d2),num(L.d3)].filter(Boolean); A.swell=Math.max(A.swell,Math.min(2.5,(dd.length?Math.min(...dd):20)/20)); lesPlaced.push({L,calc,idx,hydro:key}); return; }
       let c;
       if(A.n>0) c=add(A.bound.c,[s*.3,A.bound.R+Rr+.2,.2]);
       else if(L.origin==="ovarian"){
-        if(Rr>A.ovR*.8){ c=add(A.oc,[s*Rr*.35,Rr*.45,.2]); A.ovc=add(c,mul(norm([-s*.6,-.8,-.15]),Rr*.88)); A.bound={c,R:Rr}; } // ovarian tissue as a crescent at one pole
+        if(Rr>A.ovR*.8){ c=clearOf(add(A.oc,[s*Rr*.35,Rr*.45,.2]),Rr,s); A.ovc=add(c,mul(norm([-s*.6,-.8,-.15]),Rr*.88)); A.bound={c,R:Rr}; } // ovarian tissue as a crescent at one pole
         else c=add(A.oc,[s*A.ovR*.18,A.ovR*.12,.15]);
       }
       else if(L.origin==="paraovarian") c=add(A.oc,[s*.3,A.ovR+Rr+.4,.3]);
       else if(L.origin==="tubal") c=add(A.oc,[s*(A.ovR+Rr*.6),A.ovR*.6+Rr*.5,-.6]);
       else c=add(A.oc,[0,-(A.ovR+Rr+.3),-.8]);
-      A.n++; A.bound=enclose(A.bound,{c,R:Rr});
+      c=clearOf(c,Rr,s); A.n++; A.bound=enclose(A.bound,{c,R:Rr});
       lesPlaced.push({L,calc,idx,c,Rr});
     });
     for(const key of ["R","L"]){
@@ -1270,13 +1277,13 @@ function pelvisScene(cfg){
       A.bound=enclose(A.bound,{c:A.ovc,R:A.ovR});
       const axis=norm([s*.35,1,-.3]);
       if(o.vis==="visualized"){
-        meshes.push(ellipsoid(A.ovc,A.r,{axis,seg:16,col:C3.ovary,a:.5,spec:.2,noise:(x,y,z)=>1+.04*Math.sin(7*x+3*z)*Math.sin(5*y)}));
+        const ovm=ellipsoid(A.ovc,A.r,{axis,seg:16,col:C3.ovary,a:.5,spec:.2,noise:(x,y,z)=>1+.04*Math.sin(7*x+3*z)*Math.sin(5*y)}); ovm.ovSide=key; meshes.push(ovm);
         const Bs=G3.basis(axis), fr=Math.min(...A.r)*.42;
         for(let i=0;i<Math.min(25,o.fol);i++){
           const d=norm([rnd()-.5,rnd()-.5,rnd()-.5]), q=add(A.ovc,add(add(mul(Bs.x,d[0]*A.r[0]*.62),mul(Bs.y,d[1]*A.r[1]*.62)),mul(Bs.z,d[2]*A.r[2]*.62))), rr=fr*(.55+.45*rnd());
-          meshes.push(ellipsoid(q,[rr,rr,rr],{seg:7,col:C3.follicle,a:.75,spec:.5}));
+          const fm=ellipsoid(q,[rr,rr,rr],{seg:7,col:C3.follicle,a:.75,spec:.5}); fm.ovSide=key; meshes.push(fm);
         }
-        labels.push({p:add(A.ovc,[0,-(A.ovR+.8),0]),t:o.label,short:key+" ov",col:o.col});
+        labels.push({p:add(A.ovc,mul(axis,-A.r[1]*.97)),t:o.label,short:key+" ov",col:o.col});   // lower pole of the ovary
       } else labels.push({p:A.oc,t:`${side} ovary ${o.vis}`,short:key+" ov –"});
       // ---- fallopian tube, rooted in the cornu: interstitial part inside the myometrium, cuff at the serosa,
       //      isthmus → ampulla arching over the adnexa → infundibulum opening onto the ovary
@@ -1305,7 +1312,7 @@ function pelvisScene(cfg){
       // funnel from the endometrial angle (endometrial thickness) down to the narrow intramural lumen, small cuff where it leaves the serosa
       const tubeR=t=>.09+(bc-.09)*(1-smooth(tA*.85,tA+(tS-tA)*.6,t))+.05*smooth(tA,tS,t)+.12*Math.exp(-(((t-tS)/.05)**2))+.2*smooth(tS+.1,.75,t)+sw*smooth(.35,.6,t)*(1-smooth(.86,.98,t));
       meshes.push(tubeMesh(P,tubeR,14,{col:C3.tube,a:.93,spec:.3,col2:C3.endo,mix:t=>smooth(tA*.4,tS+.05,t),fade:t=>.45*smooth(0,tA*.9,t)+.55*smooth(tA,tS+.04,t)}));
-      if(key==="R") labels.push({p:add(Ang,[0,.55,0]),t:"Endometrial angle → interstitial tube",short:"Cornu"});
+      if(key==="R") labels.push({p:Ang,t:"Endometrial angle → interstitial tube",short:"Cornu"});
       const ax=norm(sub(P[P.length-1],P[P.length-2])), Bf=G3.basis(ax);
       if(sw){ // hydrosalpinx: occluded, club-shaped distal end, no fimbriae
         meshes.push(ellipsoid(mouth,[tubeR(1),tubeR(1)*1.15,tubeR(1)],{axis:ax,seg:12,col:C3.tube,a:.93,spec:.3}));
@@ -1350,7 +1357,14 @@ function pelvisScene(cfg){
         { const pq=(x,y,z)=>add(Pis,[s*x,y,z]);
           const eia=nf(tubeMesh(catmull([pq(3.75,5.3,-4.75),pq(4.6,4.6,-3.6),pq(5.3,3.6,-.8),pq(5.6,2,3),pq(5.55,.9,5.4),pq(5.5,.4,6.2),pq(5.5,-1.3,6.6)],6),()=>.36,10,{col:C3.art,a:.95,spec:.45,fade:t=>(cfg.art?1:.35+.65*smooth(0,.3,t))*(1-smooth(.82,1,t))})); eia.tag="eia-"+key; meshes.push(eia);
           const iea=nf(tubeMesh(catmull([pq(5.55,.75,5.6),pq(5.4,1.6,6.35),pq(4.6,3.5,6.7),pq(3.2,6.5,6.9)],5),()=>.1,7,{col:C3.art,a:.95,spec:.45,fade:t=>1-smooth(.5,1,t)})); iea.tag="iea-"+key; meshes.push(iea);
-          if(s===1){ labels.push({p:pq(5.6,2,3),t:"External iliac a.",short:"EIA"}); labels.push({p:pq(4.6,3.5,6.7),t:"Inferior epigastric a.",short:"IEA"}); } }
+          if(s===1){ labels.push({p:pq(5.6,2,3),t:"External iliac a.",short:"EIA"}); labels.push({p:pq(4.6,3.5,6.7),t:"Inferior epigastric a.",short:"IEA"}); }
+          if(!cfg.art){   // common iliac → internal iliac (hypogastric) trunk → anterior division → origin of the uterine artery
+            const tr=(pts,r,seg,o={})=>{ const m=nf(tubeMesh(catmull(pts,5),typeof r==="function"?r:()=>r,seg,{col:C3.art,a:.95,spec:.45,...o})); meshes.push(m); return m; };
+            tr([pq(2.3,7.1,-5.3),pq(3.1,6.1,-5.05),pq(3.75,5.3,-4.75)],.42,10,{fade:t=>.35+.65*smooth(0,.5,t)});          // common iliac (distal part)
+            tr([pq(3.75,5.3,-4.75),pq(4.3,4.3,-5.05),pq(4.6,3,-5),pq(4.85,2.35,-4.6),ua[0]],t=>.28-.1*t,9).tag="iia-"+key;   // internal iliac → anterior division
+            tr([pq(4.6,3,-5),pq(4.55,3.1,-5.6),pq(4.9,2.3,-6.8)],.18,7,{fade:t=>1-smooth(.4,1,t)});                       // posterior division (stub)
+            meshes.push(ellipsoid(ua[0],[.2,.2,.2],{seg:8,col:"#e0a400",a:.95,spec:.5}));                                  // uterine artery origin
+            if(s===1){ labels.push({p:pq(4.3,4.3,-5.05),t:"Internal iliac a.",short:"IIA"}); labels.push({p:ua[0],t:"Uterine a. origin",short:"UtA origin"}); } } }
         if(cfg.art){
           const AR=C3.art, ah=(pts,r,per=5,seg=7,o={})=>{ const m=Object.assign(tubeMesh(catmull(pts,per),typeof r==="function"?r:()=>r,seg,{col:AR,a:.95,spec:.45,...o}),o.nofit?{nofit:true}:{}); meshes.push(m); return m; };
           // iliac system: aorta (bifurcates ~L4) → common iliac → internal iliac, which divides at the upper border of the
@@ -1414,7 +1428,7 @@ function pelvisScene(cfg){
               [dp,"UtA Doppler site (TVS, internal os)","UtA PI"]];
             lab.forEach(([p,t,sh])=>labels.push({p,t,short:sh}));
             labels.push({p:AO,t:"Origin of uterine a. (anterior division of internal iliac)",short:"UtA origin",col:"#e0a400"});
-            labels.push({p:pp(3.4,2.6,4.6),t:"Medial umbilical lig. (obliterated umbilical a.)",short:"MUL"});
+            labels.push({p:pp(3.8,3.3,6.4),t:"Medial umbilical lig. (obliterated umbilical a.)",short:"MUL"});
           }
         }
       }
@@ -1472,8 +1486,10 @@ function pelvisScene(cfg){
       const col=oradsCol(calc.fin);
       if(hydro){ const A=adn[hydro]; labels.push({p:add(A.bound.c,[0,A.bound.R+1.7,0]),t:`A${idx+1} · hydrosalpinx · O-RADS ${calc.fin??"?"}`,short:`A${idx+1}·${calc.fin??"?"}`,col}); return; }
       const p=lesionParts(L,c,Rr,idx+3,cfg.det);
+      p.M.forEach(m=>m.les=true); p.Ln.forEach(l=>l.les=true); p.Lb.forEach(l=>l.les=true);
       meshes.push(...p.M); lines.push(...p.Ln); labels.push(...p.Lb);
-      labels.push({p:[c[0],p.top+.6,c[2]],t:`A${idx+1} · ${calc.iota.type} · O-RADS ${calc.fin??"?"}`,short:`A${idx+1}·${calc.fin??"?"}`,col});
+      lesVol.push({c,r:p.r,s:L.side==="Left"?1:L.side==="Right"?-1:0,ovSide:L.origin==="ovarian"?(L.side==="Left"?"L":L.side==="Right"?"R":null):null});
+      labels.push({p:[c[0],p.top,c[2]],t:`A${idx+1} · ${calc.iota.type} · O-RADS ${calc.fin??"?"}`,short:`A${idx+1}·${calc.fin??"?"}`,col,les:true});
     });
   }
   /* free fluid, ascites, peritoneal nodules */
@@ -1500,7 +1516,7 @@ function pelvisScene(cfg){
     meshes.push(pm);
     // label the deepest pocket: lowest vertex of the pool
     let lo=pm.V[0]; for(const q of pm.V) if(q[2]<lo[2]) lo=q;
-    labels.push({p:add(lo,[0,-1.2,-.6]),t:flu.asc?`Deepest pocket ${flu.depth.toFixed(1)} cm (PoD)`:`Pouch of Douglas fluid · ${flu.depth.toFixed(1)} cm`,short:"PoD"});
+    labels.push({p:lo,t:flu.asc?`Deepest pocket ${flu.depth.toFixed(1)} cm (PoD)`:`Pouch of Douglas fluid · ${flu.depth.toFixed(1)} cm`,short:"PoD"});
     if(flu.asc){
       if(flu.big){   // over the pelvic brim: lower abdomen and both paracolic gutters, fading upward
         const fadeUp=(m,y0,y1)=>{ m.va=m.V.map(q=>1-smooth(y0,y1,q[1])); return nf(m); };
@@ -1508,18 +1524,50 @@ function pelvisScene(cfg){
         for(const s of [-1,1]) meshes.push(fadeUp(pool(add(Pis,[s*6.6,7.5,-1.6]),[1.9,6.5,2.2],{a:.15,seg:9}),Pis[1]+6,Pis[1]+13.5));
       }
       let top=pm.V[0]; for(const q of pm.V) if(q[1]>top[1]&&q[2]>=zL-.01) top=q;
-      labels.push({p:add(top,[3.2,1.2,.3]),t:`Ascites · ${flu.grade}${flu.big?" (to paracolic gutters)":""}`,short:"Ascites"});
+      labels.push({p:top,t:`Ascites · ${flu.grade}${flu.big?" (to paracolic gutters)":""}`,short:"Ascites"});
     }
   }
   if(gl.nodules){ let last;
     for(let i=0;i<9;i++){ const k=U.at(.25+.6*rnd()), ang=Math.PI*(1.15+.7*rnd()), q=add(U.C[k],add(mul(X,U.A[k]*1.08*Math.cos(ang)),mul(U.Nn[k],U.B[k]*1.08*Math.sin(ang)))), rr=.2+.25*rnd();
       meshes.push(ellipsoid(q,[rr,rr*.8,rr],{seg:7,col:"#b5524a",noise:(x,y,z)=>1+.2*Math.sin(9*x)*Math.cos(7*y+z)})); last=q; }
-    labels.push({p:add(last,[0,-.9,-.5]),t:"Peritoneal nodules",short:"Nodules"}); }
+    labels.push({p:last,t:"Peritoneal nodules",short:"Nodules"}); }
   if(cfg.ctx){ const c=add(U.C[U.at(.36)],[0,-2.3,3.9]);   // bladder: in front of the cervix, the anteverted body rests on its dome
     const bm=ellipsoid(c,[3.1,1.8,2.2],{seg:16,col:C3.bladder,a:.055,spec:.3});
     // the uterus indents the bladder dome instead of passing through it
     bm.V=bm.V.map(v=>{ let q=v, n=0; while(U.inS(q)&&n++<60) q=[q[0],q[1]-.06,q[2]+(q[2]<c[2]?.03:0)]; return n?[q[0],q[1]-.12,q[2]]:q; });
-    meshes.push(nf(bm)); labels.push({p:add(c,[0,-2.2,0]),t:"Bladder",short:"Bladder"}); }
+    bm.blad=true; meshes.push(nf(bm)); labels.push({p:add(c,[0,0,2.15]),t:"Bladder",short:"Bladder"}); }   // anterior wall
+  // adnexal masses displace their neighbours (tubes, ligaments, vessels, ureter, contralateral adnexa, fluid-free structures)
+  // instead of overlapping them: within 1.35 radii every point is pushed out radially (in the mass's ellipsoid metric) to
+  // a shell just outside it, with a smooth fall-off; tubes are moved ring by ring sideways so a vessel bends round the mass.
+  if(lesVol.length){
+    const norm3=(d,r)=>Math.hypot(d[0]/r[0],d[1]/r[1],d[2]/r[2]);
+    const push=(q,pad)=>{ let p=q; for(const Lv of lesVol){ const r=Lv.r.map(x=>x+pad+.08), d=sub(p,Lv.c), n=norm3(d,r);
+        if(n<1.35){ const n2=1.04+n*(.31/1.35); p=n<1e-4?add(Lv.c,[r[0]*n2*(Lv.s||1),0,0]):add(Lv.c,mul(d,n2/n)); } } return p; };
+    const near=(q,pad)=>lesVol.some(Lv=>norm3(sub(q,Lv.c),Lv.r.map(x=>x+pad+.08))<1.35);
+    const keepOv=new Set(lesVol.map(Lv=>Lv.ovSide).filter(Boolean));
+    meshes.forEach((m,mi)=>{
+      if(mi<nUt||m.les||m.blad||m.col===C3.fluid||(m.ovSide&&keepOv.has(m.ovSide))) return;
+      if(m.ring){   // tube: move each ring rigidly, sideways to the tube, so the vessel/ligament/tube bends round the mass
+        const M=m.ring, nR=m.V.length/M, G=[]; for(let i=0;i<nR;i++){ let g=[0,0,0]; for(let j=0;j<M;j++) g=add(g,m.V[i*M+j]); G.push(mul(g,1/M)); }
+        if(!G.some((g,i)=>near(g,m.rr[i]||.1))) return;
+        const D=G.map((g,i)=>{ const pad=m.rr[i]||.1, t=norm(sub(G[Math.min(nR-1,i+1)],G[Math.max(0,i-1)])); let dl=sub(push(g,pad),g);
+          if(G3.len(dl)<1e-6) return dl;
+          let side=sub(dl,mul(t,G3.dot(dl,t))); if(G3.len(side)<G3.len(dl)*.35){   // passing through the middle: go round it laterally/upward
+            const Lv=lesVol[0], off=sub(g,Lv.c), lat=sub(off,mul(t,G3.dot(off,t))); side=G3.len(lat)>.05?lat:sub([Lv.s||1,.6,0],mul(t,G3.dot([Lv.s||1,.6,0],t))); }
+          side=norm(side); const inShell=q=>lesVol.some(Lv=>norm3(sub(q,Lv.c),Lv.r.map(x=>x+pad+.08))<1.04);
+          let q=g; for(let k=0;k<90&&inShell(q);k++) q=add(q,mul(side,.08));
+          const base=sub(push(g,pad),g), want=sub(q,g); return G3.len(want)>G3.len(base)?want:base; });
+        // smooth the ring displacements along the tube so the bend is gentle
+        const Ds=D.map((d,i)=>{ let a=[0,0,0], w=0; for(let k=-2;k<=2;k++){ const j=Math.min(nR-1,Math.max(0,i+k)), wk=3-Math.abs(k); a=add(a,mul(D[j],wk)); w+=wk; } const sm=mul(a,1/w); return G3.len(sm)>G3.len(d)?sm:d; });
+        m.V=m.V.map((v,vi)=>add(v,Ds[Math.floor(vi/M)]));
+        return; }
+      let c=[0,0,0]; for(const v of m.V) c=add(c,v); c=mul(c,1/m.V.length); let R=0; for(const v of m.V) R=Math.max(R,G3.len(sub(v,c)));
+      if(R<.9){ if(!near(c,R)) return; const dl=sub(push(c,R),c); m.V=m.V.map(v=>add(v,dl)); return; }   // small part (fimbria, follicle, nodule): moved whole
+      m.V=m.V.map(v=>near(v,0)?push(v,0):v);   // sheets and larger organs: pushed point by point
+    });
+    lines.forEach(l=>{ if(l.les) return; l.a=push(l.a,0); l.b=push(l.b,0); });
+    labels.forEach(l=>{ if(l.les||l.nolead) return; l.p=push(l.p,.15); });
+  }
   // auto-fit: centre the scene on its bounding box and size the camera to a bounding sphere
   let lo=[1e9,1e9,1e9], hi=[-1e9,-1e9,-1e9];
   meshes.forEach(m=>!m.nofit&&m.V.forEach(v=>{ for(let k=0;k<3;k++){ if(v[k]<lo[k]) lo[k]=v[k]; if(v[k]>hi[k]) hi[k]=v[k]; } }));
@@ -1603,7 +1651,7 @@ function lesionParts(L,off,sc,seed,withLabels){
     M.push(quad([[cx-w0,y0,cz],[cx+w0,y0,cz],[cx+w1,y1,cz],[cx-w1,y1,cz]],{col:"#1a2230",a:.13}));
     M.push(quad([[cx,y0,cz-w0],[cx,y0,cz+w0],[cx,y1,cz+w1],[cx,y1,cz-w1]],{col:"#1a2230",a:.13}));
     if(withLabels) Lb.push({p:[cx,y1-.08*sc,cz],t:"acoustic shadow"}); }
-  return {M,Ln,Lb,top:off[1]+r[1]};
+  return {M,Ln,Lb,top:off[1]+r[1],r};
 }
 const IOTA_REF=[
   ["Unilocular",{loc:"1",contents:"anechoic",cs:"1"}],
