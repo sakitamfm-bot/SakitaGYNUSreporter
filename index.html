@@ -1004,7 +1004,14 @@ const G3 = (()=>{
       const cv=this.cv, dpr=window.devicePixelRatio||1, W=cv.clientWidth, H=cv.clientHeight; if(!W||!H) return;
       if(cv.width!==Math.round(W*dpr)||cv.height!==Math.round(H*dpr)){ cv.width=Math.round(W*dpr); cv.height=Math.round(H*dpr); }
       const ctx=this.ctx; ctx.setTransform(dpr,0,0,dpr,0,0); ctx.clearRect(0,0,W,H);
-      const s=this.scene, ext=s.extent||2, extW=s.extentW||ext, dist=Math.max(ext,extW)*3.4, F=Math.min(W/extW,H/ext)*.46*this.zoom*dist;
+      const s=this.scene, ext=s.extent||2, extW=s.extentW||ext, dist=Math.max(ext,extW)*3.4;
+      // labels live in two side gutters, so the model is fitted into the middle band and never covered by a label
+      const LFONT="600 11px -apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif", labOn=this.labels!==false&&(s.labels||[]).length>0;
+      let GW=0; if(labOn){ ctx.font=LFONT; const narrow=W<520;
+        const ws=s.labels.map(l=>ctx.measureText(narrow&&l.short?l.short:l.t).width+(l.col?20:12));
+        GW=Math.round(Math.min(Math.max(70,...ws)+16, W*(narrow?.24:.23))); }
+      this.gutter=GW;
+      const F=Math.min((W-2*GW)/extW,H/ext)*.46*this.zoom*dist;
       const cy=Math.cos(this.yaw), sy=Math.sin(this.yaw), cp=Math.cos(this.pitch), sp=Math.sin(this.pitch);
       const tr=p=>{ const x=p[0]*cy+p[2]*sy, z0=-p[0]*sy+p[2]*cy; return [x,p[1]*cp-z0*sp,p[1]*sp+z0*cp]; };
       const pr=q=>{ const k=F/(dist-q[2]); return [W/2+q[0]*k,H/2-q[1]*k]; };
@@ -1045,42 +1052,47 @@ const G3 = (()=>{
       }
       if(FC.size>40000) FC.clear();
       const css=getComputedStyle(document.documentElement), ink=css.getPropertyValue("--ink").trim(), card=css.getPropertyValue("--card").trim();
-      ctx.font="600 11px -apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif"; ctx.textBaseline="middle";
-      const placed=[], LBS=(this.labels===false?[]:s.labels||[]).map((lb,i)=>{ const txt=(W<520&&lb.short)?lb.short:lb.t, q=pr(tr(lb.p)); return {lb,txt,q,w:ctx.measureText(txt).width+(lb.col?20:12),pri:lb.col?0:1,i}; }).sort((a,b)=>a.pri-b.pri||a.i-b.i);
-      // keep labels clear of the overlay hint (top left) and the toolbar (bottom right)
-      const tb=this.cv.parentElement&&this.cv.parentElement.querySelector(".v3tools"), tw=tb?tb.offsetWidth+12:260;
-      placed.push({x:0,y:14,w:Math.min(W,330)},{x:W-tw,y:H-20,w:tw});
-      const hit=(x,y,w)=>placed.some(b=>x<b.x+b.w+4&&x+w+4>b.x&&Math.abs(y-b.y)<20);
-      for(const L of LBS){
-        // try nearby slots off the anchor (so the structure stays visible): above/below first, then sideways; keep inside the canvas
-        const d0=L.lb.nolead?[0]:[];
-        const find=(w,far)=>{ const dys=[...d0,-26,26,-47,47,-68,68,-89,89,-110,110,...(far?[-131,131,-152,152,-173,173]:[])], dxs=[0,-(w/2+14),w/2+14,-(w+20),w+20,...(far?[-(1.5*w+30),1.5*w+30]:[])];
-          for(const dx of dxs) for(const dy of dys){ const x=Math.max(4,Math.min(W-w-4,L.q[0]-w/2+dx)), y=Math.max(12,Math.min(H-12,L.q[1]+dy)); if(!hit(x,y,w)) return [x,y]; } return null; };
-        // full text near the structure → short form near it (explained in the footnote) → either form further away
-        let best=find(L.w,false);
-        if(!best&&L.lb.short&&L.txt!==L.lb.short){ const w2=ctx.measureText(L.lb.short).width+(L.lb.col?20:12), b2=find(w2,false); if(b2){ L.txt=L.lb.short; L.w=w2; best=b2; } }
-        if(!best) best=find(L.w,true);
-        if(!best&&L.lb.short){ const w2=ctx.measureText(L.lb.short).width+(L.lb.col?20:12), b2=find(w2,true); if(b2){ L.txt=L.lb.short; L.w=w2; best=b2; } }
-        if(!best) best=[Math.max(4,Math.min(W-L.w-4,L.q[0]-L.w/2)),Math.max(12,Math.min(H-12,L.q[1]+110))];
-        L.x=best[0]; L.y=best[1]; placed.push({x:L.x,y:L.y,w:L.w});
+      ctx.font=LFONT; ctx.textBaseline="middle";
+      const LBS=(labOn?s.labels:[]).map((lb,i)=>({lb,q:pr(tr(lb.p)),i}));
+      // text: full form if it fits the gutter, else the short form (explained in the footnote), else shortened with …
+      const colMax=Math.max(40,GW-10);
+      for(const L of LBS){ const pad=L.lb.col?20:12; let t=(W<520&&L.lb.short)?L.lb.short:L.lb.t, w=ctx.measureText(t).width+pad;
+        if(w>colMax&&L.lb.short){ t=L.lb.short; w=ctx.measureText(t).width+pad; }
+        if(w>colMax){ while(t.length>3&&ctx.measureText(t+"…").width+pad>colMax) t=t.slice(0,-1); t+="…"; w=ctx.measureText(t).width+pad; }
+        L.txt=t; L.w=w; }
+      // two columns: structures on the left half of the screen label into the left gutter, the rest into the right one.
+      // Keep clear of the hint (top left) and the toolbar (bottom right).
+      const tb=this.cv.parentElement&&this.cv.parentElement.querySelector(".v3tools"), tbh=tb?tb.offsetHeight+16:0;
+      const top=30, bot={L:H-12,R:H-12-tbh}, step=21, capOf=c=>Math.max(1,Math.floor((bot[c]-top)/step)+1);
+      // split at the median anchor x so both sides carry about the same number of labels
+      const xs=LBS.filter(L=>!L.lb.nolead).map(L=>L.q[0]).sort((a,b)=>a-b), mx=xs.length?(xs[(xs.length-1)>>1]+xs[xs.length>>1])/2:W/2;
+      const col={L:[],R:[]}; for(const L of LBS) col[(L.lb.nolead?L.q[0]<W/2:L.q[0]<mx)?"L":"R"].push(L);
+      const mv=(a,b)=>{ col[a].sort((u,v)=>a==="L"?u.q[0]-v.q[0]:v.q[0]-u.q[0]); col[b].push(col[a].pop()); };
+      while(col.L.length>capOf("L")&&col.R.length<capOf("R")) mv("L","R");
+      while(col.R.length>capOf("R")&&col.L.length<capOf("L")) mv("R","L");
+      for(const c of ["L","R"]){
+        const A=col[c], st=Math.min(step,A.length>1?(bot[c]-top)/(A.length-1):step);
+        A.sort((u,v)=>(u.lb.nolead?0:1)-(v.lb.nolead?0:1)||u.q[1]-v.q[1]);   // orientation marker heads its column, then by height
+        let prev=-1e9; for(const L of A){ L.y=Math.max(L.lb.nolead?top:Math.max(top,Math.min(bot[c],L.q[1])),prev+st); prev=L.y; }
+        let next=1e9; for(let i=A.length-1;i>=0;i--){ const L=A[i]; L.y=Math.min(L.y,bot[c],next-st); next=L.y; }
+        for(const L of A){ L.y=Math.max(top,L.y); L.side=c; L.x=c==="L"?Math.max(4,GW-6-L.w):W-GW+6; }
       }
-      // leader lines: from the nearest point of each label box to its structure
+      // leader lines: from the inner edge of each label to its structure
       const lead=css.getPropertyValue("--muted").trim()||"#888";
-      ctx.lineWidth=1; ctx.strokeStyle=lead; ctx.globalAlpha=.8;
+      ctx.lineWidth=1; ctx.strokeStyle=lead; ctx.globalAlpha=.75;
       for(const L of LBS){ if(L.lb.nolead) continue;
-        const ex=Math.max(L.x+4,Math.min(L.x+L.w-4,L.q[0])), ey=Math.max(L.y-9,Math.min(L.y+9,L.q[1]));
-        if(Math.hypot(ex-L.q[0],ey-L.q[1])<1) continue;
-        ctx.beginPath(); ctx.moveTo(L.q[0],L.q[1]); ctx.lineTo(ex,ey); ctx.stroke(); }
+        const ex=L.side==="L"?L.x+L.w:L.x, ey=L.y, kx=L.side==="L"?ex+8:ex-8;
+        ctx.beginPath(); ctx.moveTo(ex,ey); ctx.lineTo(kx,ey); ctx.lineTo(L.q[0],L.q[1]); ctx.stroke(); }
       ctx.globalAlpha=1;
       for(const L of LBS){
         const lb=L.lb, txt=L.txt, w=L.w, x=L.x, y=L.y;
         ctx.beginPath(); if(ctx.roundRect) ctx.roundRect(x,y-9,w,18,9); else ctx.rect(x,y-9,w,18);
-        ctx.globalAlpha=.9; ctx.fillStyle=card; ctx.fill(); ctx.globalAlpha=1;
+        ctx.globalAlpha=.94; ctx.fillStyle=card; ctx.fill(); ctx.globalAlpha=1;
         ctx.strokeStyle=lb.col||"rgba(128,128,128,.45)"; ctx.lineWidth=1; ctx.stroke();
         if(lb.col){ ctx.fillStyle=lb.col; ctx.beginPath(); ctx.arc(x+9,y,3.5,0,Math.PI*2); ctx.fill(); }
         ctx.fillStyle=ink; ctx.fillText(txt,x+(lb.col?16:6),y+.5);
       }
-      // anchor dots on the structures (drawn last so a label box never hides them)
+      // anchor dots on the structures
       for(const L of LBS){ if(L.lb.nolead) continue; ctx.beginPath(); ctx.arc(L.q[0],L.q[1],2.6,0,Math.PI*2); ctx.fillStyle=L.lb.col||lead; ctx.fill(); ctx.lineWidth=1; ctx.strokeStyle=card; ctx.stroke(); }
       // report the label texts actually shown (for the abbreviation footnote)
       const shown=LBS.map(L=>L.txt).join("\n"); this.shownTexts=LBS.map(L=>L.txt); if(shown!==this.shown){ this.shown=shown; this.onLabels&&this.onLabels(this.shownTexts); }
