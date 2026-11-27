@@ -256,7 +256,7 @@ function defaults(){
     fib:[],
     ov:{R:{vis:"visualized",l:"",w:"",h:"",fol:"",notes:""},L:{vis:"visualized",l:"",w:"",h:"",fol:"",notes:""}},
     les:[],
-    gl:{ascites:false,nodules:false,pod:"none",other:""},
+    gl:{ascites:false,ascAmt:"moderate",nodules:false,pod:"none",pocket:"",other:""},
     set:{bilocular:"2",primary:"both"},
     ui:{v:"case",ctx:true,art:false,det:false}
   };
@@ -407,7 +407,8 @@ function renderGl(){
   $("secGl").innerHTML = `<h2><span class="n">5</span>Pelvis<button class="glink" data-guide="ascites">Measurement guide</button></h2>
   ${fChk("gl.ascites","<b>Ascites</b>: fluid beyond the pouch of Douglas (between bladder and uterus, above the fundus, or in Morison's pouch)")}
   ${fChk("gl.nodules","Peritoneal nodules / carcinomatosis")}
-  <div class="grid w">${fSel("gl.pod","Pouch of Douglas fluid (descriptive)",[["none","None"],["small","Small amount"],["moderate","Moderate"]])}${fTxt("gl.other","Other findings","")}</div>`;
+  <div class="grid w">${fSel("gl.ascAmt","Ascites amount (if present)",[["mild","Mild: pelvis, around uterus/adnexa"],["moderate","Moderate: fills pelvis, above fundus"],["large","Large: into abdomen / paracolic gutters"]])}${fSel("gl.pod","Pouch of Douglas fluid (descriptive)",[["none","None"],["small","Small amount"],["moderate","Moderate"]])}${fNum("gl.pocket","Deepest fluid pocket (optional)","cm",.1)}${fTxt("gl.other","Other findings","")}</div>
+  <p class="hint">The 3D model fills the pelvis from the pouch of Douglas upward to the level set by these fields (patient supine).</p>`;
 }
 function renderSet(){
   $("secSet").innerHTML = `<h2><span class="n">6</span>Rule settings</h2>
@@ -719,9 +720,10 @@ function buildReport(){
 
   // pelvis
   line("PELVIS");
-  line(`- Ascites: ${S.gl.ascites?"PRESENT":"absent"}. Peritoneal nodules: ${S.gl.nodules?"PRESENT":"not seen"}. Pouch of Douglas fluid: ${S.gl.pod}.`);
+  const pk=parseFloat(S.gl.pocket)>0?` Deepest fluid pocket ${(+S.gl.pocket).toFixed(1)} cm.`:"";
+  line(`- Ascites: ${S.gl.ascites?`PRESENT (${S.gl.ascAmt||"moderate"})`:"absent"}. Peritoneal nodules: ${S.gl.nodules?"PRESENT":"not seen"}. Pouch of Douglas fluid: ${S.gl.pod}.${pk}`);
   if(S.gl.other) line(`- ${S.gl.other}`);
-  if(S.gl.ascites||S.gl.nodules) imp.push(`${[S.gl.ascites?"Ascites":"",S.gl.nodules?"peritoneal nodules":""].filter(Boolean).join(" and ")} present.`);
+  if(S.gl.ascites||S.gl.nodules) imp.push(`${[S.gl.ascites?`${(S.gl.ascAmt||"moderate")[0].toUpperCase()+(S.gl.ascAmt||"moderate").slice(1)} ascites`:"",S.gl.nodules?"peritoneal nodules":""].filter(Boolean).join(" and ")} present.`);
   line("");
 
   line("IMPRESSION");
@@ -874,7 +876,7 @@ function openGuide(id,grp){
 // Small "?" next to each measurement field, opening only that measurement's card.
 const GTIP=[[/^ut\.l$/,"uterus"],[/^ut\.et$/,"endometrium"],[/^fib\.\d+\.(l|im|om)$/,"fibroid"],[/^fib\.\d+\.cs$/,"cs"],
   [/^ov\.[RL]\.l$/,"ovary"],[/^ov\.[RL]\.fol$/,"afc"],[/^les\.\d+\.d1$/,"lesion"],[/^les\.\d+\.(solidTumor|flat|otherSolid|tiny|s1)$/,"solid"],
-  [/^les\.\d+\.(pp|ph)$/,"pp"],[/^les\.\d+\.loc$/,"loc"],[/^les\.\d+\.cs$/,"cs"],[/^les\.\d+\.shadow$/,"shadow"],[/^gl\.(ascites|pod)$/,"ascites"]];
+  [/^les\.\d+\.(pp|ph)$/,"pp"],[/^les\.\d+\.loc$/,"loc"],[/^les\.\d+\.cs$/,"cs"],[/^les\.\d+\.shadow$/,"shadow"],[/^gl\.(ascites|ascAmt|pod|pocket)$/,"ascites"]];
 function tipify(){
   document.querySelectorAll("main [data-p]").forEach(inp=>{
     const hit=GTIP.find(([re])=>re.test(inp.dataset.p)); if(!hit) return;
@@ -1182,6 +1184,19 @@ function placeFib(U,f,n){
 function pushOut(m,c,rr){ for(let k=0;k<m.V.length;k++){ const d=G3.sub(m.V[k],c), l=G3.len(d); if(l<rr&&l>1e-6) m.V[k]=G3.add(c,G3.mul(d,rr/l)); } }
 function enclose(a,b){ const {add,sub,mul,len}=G3, d=len(sub(b.c,a.c)); if(d+b.R<=a.R) return a; if(d+a.R<=b.R) return b; const R=(d+a.R+b.R)/2; return {c:add(a.c,mul(sub(b.c,a.c),(R-a.R)/(d||1))),R}; }
 
+// Free-fluid amount for the 3D pelvis: depth of the fluid level above the most dependent point (pouch of Douglas), cm.
+// An entered deepest pocket overrides the descriptive grade.
+const FLU={c:[0,.8,.3],r:[4.2,4.6,2.6],tilt:.45};   // pelvic fluid basin, relative to the isthmus (cm, rad)
+function fluidAmount(gl){
+  gl=gl||{}; const pod=gl.pod&&gl.pod!=="none"?gl.pod:null, asc=!!gl.ascites;
+  if(!pod&&!asc) return null;
+  const grade=asc?(gl.ascAmt||"moderate"):pod;
+  const depthBy={small:1.0,moderate:1.8,mild:2.8,"asc-moderate":4.4,large:6.2};
+  let depth=depthBy[asc&&grade==="moderate"?"asc-moderate":grade]??1.8;
+  const dp=parseFloat(gl.pocket); if(dp>0) depth=Math.min(7,Math.max(.4,dp));
+  return {depth,asc,grade,big:asc&&(grade==="large"||depth>=5.6)};
+}
+
 function pelvisScene(cfg){
   const nf=m=>(m.nofit=true,m);
   const {add,sub,mul,norm,ellipsoid,cylinder}=G3, rnd=G3.rng(11);
@@ -1450,12 +1465,39 @@ function pelvisScene(cfg){
   }
   /* free fluid, ascites, peritoneal nodules */
   const gl=cfg.gl||{}, k30=U.at(.3);
-  if((gl.pod&&gl.pod!=="none")||gl.ascites){ const big=gl.pod==="moderate"||gl.ascites, c=add(U.C[k30],[0,-.9,-(U.B[k30]+(big?1.5:1.1))]);   // pouch of Douglas: behind the cervix / posterior fornix
-    meshes.push(ellipsoid(c,big?[2.8,1.1,1.6]:[1.6,.6,.9],{seg:12,col:C3.fluid,a:.3,spec:.6})); labels.push({p:add(c,[0,-1.5,0]),t:"Pouch of Douglas fluid",short:"PoD"}); }
-  if(gl.ascites){ const k5=U.at(.5), tp=[0,Math.max(...serosa.V.map(v=>v[1]))+1.5,U.C[k5][2]];
-    meshes.push(nf(ellipsoid(tp,[6.5,1.1,4],{seg:14,col:C3.fluid,a:.16})));
-    meshes.push(ellipsoid(add(U.C[k5],mul(U.Nn[k5],U.B[k5]+1)),[2.5,.8,1],{seg:10,col:C3.fluid,a:.22}));
-    labels.push({p:add(tp,[4.5,1.4,0]),t:"Ascites",short:"Ascites"}); }
+  // Free fluid lies in a fixed pelvic basin (not tied to the uterus) and fills it from the most dependent point upward.
+  // Patient supine: gravity is posterior (-z), so the pouch of Douglas fills first, then the paravesical/vesicouterine
+  // spaces and the fluid rises around the uterus and adnexa; large ascites spills over the brim into the paracolic gutters.
+  const flu=fluidAmount(gl);
+  if(flu){
+    // basin long axis follows the pelvic axis: caudal end posterior (PoD, posterior fornix level), cranial end anterior (inlet)
+    const tilt=-FLU.tilt, ct=Math.cos(tilt), st=Math.sin(tilt);
+    const bc=add(Pis,FLU.c), br=FLU.r;
+    const rot=q=>{ const d=sub(q,bc); return add(bc,[d[0], d[1]*ct+d[2]*st, -d[1]*st+d[2]*ct]); };
+    let zBot=Infinity; for(let i=0;i<=64;i++){ const ph=i/64*2*Math.PI; zBot=Math.min(zBot,rot(add(bc,[0,br[1]*Math.cos(ph),br[2]*Math.sin(ph)]))[2]); }
+    const zL=zBot+flu.depth;                                                  // deepest point and fluid level
+    const blC=add(Pis,[0,-2.3,3.9]), blR=[3.1,1.8,2.2];                     // same bladder as the context layer: fluid wraps round it
+    const outBl=q=>{ const d=[(q[0]-blC[0])/blR[0],(q[1]-blC[1])/blR[1],(q[2]-blC[2])/blR[2]], r=Math.hypot(...d);
+      return r<1.04 ? add(blC,[d[0]/r*blR[0]*1.04,d[1]/r*blR[1]*1.04,d[2]/r*blR[2]*1.04]) : q; };
+    const pool=(c,r,o)=>{ const m=ellipsoid(c,r,{seg:o.seg||14,col:C3.fluid,a:o.a,xf:o.xf});
+      m.V=m.V.map(q=>outBl(q[2]>zL?[q[0],q[1],zL]:q)); m.spec=.7;
+      const deep=[43,74,107], surf=[122,174,214];                            // anechoic body, paler fluid level (the supine meniscus)
+      m.vc=m.V.map(q=>q[2]>=zL-.02?surf:deep); return m; };
+    const pm=pool(bc,br,{a:flu.asc?.34:.42,xf:rot});
+    meshes.push(pm);
+    // label the deepest pocket: lowest vertex of the pool
+    let lo=pm.V[0]; for(const q of pm.V) if(q[2]<lo[2]) lo=q;
+    labels.push({p:add(lo,[0,-1.2,-.6]),t:flu.asc?`Deepest pocket ${flu.depth.toFixed(1)} cm (PoD)`:`Pouch of Douglas fluid · ${flu.depth.toFixed(1)} cm`,short:"PoD"});
+    if(flu.asc){
+      if(flu.big){   // over the pelvic brim: lower abdomen and both paracolic gutters, fading upward
+        const fadeUp=(m,y0,y1)=>{ m.va=m.V.map(q=>1-smooth(y0,y1,q[1])); return nf(m); };
+        meshes.push(fadeUp(pool(add(Pis,[0,7,-.2]),[6.8,4.6,3.6],{a:.13,seg:11}),Pis[1]+4.5,Pis[1]+11));
+        for(const s of [-1,1]) meshes.push(fadeUp(pool(add(Pis,[s*6.6,7.5,-1.6]),[1.9,6.5,2.2],{a:.15,seg:9}),Pis[1]+6,Pis[1]+13.5));
+      }
+      let top=pm.V[0]; for(const q of pm.V) if(q[1]>top[1]&&q[2]>=zL-.01) top=q;
+      labels.push({p:add(top,[3.2,1.2,.3]),t:`Ascites · ${flu.grade}${flu.big?" (to paracolic gutters)":""}`,short:"Ascites"});
+    }
+  }
   if(gl.nodules){ let last;
     for(let i=0;i<9;i++){ const k=U.at(.25+.6*rnd()), ang=Math.PI*(1.15+.7*rnd()), q=add(U.C[k],add(mul(X,U.A[k]*1.08*Math.cos(ang)),mul(U.Nn[k],U.B[k]*1.08*Math.sin(ang)))), rr=.2+.25*rnd();
       meshes.push(ellipsoid(q,[rr,rr*.8,rr],{seg:7,col:"#b5524a",noise:(x,y,z)=>1+.2*Math.sin(9*x)*Math.cos(7*y+z)})); last=q; }
